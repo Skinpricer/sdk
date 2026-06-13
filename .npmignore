@@ -1,0 +1,13 @@
+src/
+test/
+examples/
+coverage/
+.github/
+.changeset/
+tsconfig.json
+tsconfig.build.json
+tsup.config.ts
+vitest.config.ts
+eslint.config.mjs
+*.tsbuildinfo
+.gitignore

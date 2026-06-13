@@ -1,0 +1,30 @@
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+  test: {
+    globals: false,
+    environment: "node",
+    include: ["test/**/*.test.ts"],
+    typecheck: {
+      enabled: false,
+      include: ["test/**/*.test-d.ts"],
+    },
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "lcov"],
+      include: ["src/**/*.ts"],
+      exclude: [
+        "src/index.ts",
+        "src/version.ts",
+        "src/types/**",
+        "src/http/types.ts",
+      ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 80,
+        statements: 80,
+      },
+    },
+  },
+});
