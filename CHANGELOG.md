@@ -1,5 +1,11 @@
 # @skinpricer/sdk
 
+## 0.2.0
+
+### Minor Changes
+
+- 37a3bb0: Add `executionAdjusted` to the NBBO response (`client.nbbo.get()`): fee- and executability-adjusted best bid/ask (`price`, `rawPrice`, `appliedFeeBps`, `withdrawalFlatUsdCents`, `executability`, `reasons`) plus `spreadBps`, `locked`, `crossed`, `executableConfidence`, `reasons`, and `feeModelVersion`. Adds exported types `ExecutionAdjustedNbbo` and `ExecutionAdjustedBestPrice`.
+
 ## 0.1.0
 
 Initial release.
