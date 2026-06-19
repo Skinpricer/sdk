@@ -7,10 +7,10 @@
   "homepage": "https://skinpricer.com",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/skinpricer/sdk.git"
+    "url": "git+https://github.com/Skinpricer/sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/skinpricer/sdk/issues"
+    "url": "https://github.com/Skinpricer/sdk/issues"
   },
   "keywords": [
     "skinpricer",
