@@ -1,6 +1,6 @@
 {
   "name": "@skinpricer/sdk",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Official, fully-typed TypeScript SDK for the Skinpricer pricing API (CS2 skin market pricing data).",
   "license": "MIT",
   "author": "Skinpricer",
