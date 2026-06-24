@@ -2,6 +2,7 @@
 export { SkinpricerClient } from "./client";
 export {
   DEFAULT_BASE_URL,
+  DEFAULT_PUBLIC_BASE_URL,
   DEFAULT_RETRY,
   DEFAULT_TIMEOUT_MS,
   resolveConfig,
@@ -51,7 +52,7 @@ export type {
   ValidationErrorOptions,
 } from "./errors";
 
-// Resource classes (for advanced typing / composition)
+// Resource classes
 export { BaseResource } from "./resources/resource";
 export { AggregationsResource } from "./resources/aggregations";
 export type { AggregationsBatchParams } from "./resources/aggregations";
@@ -60,7 +61,9 @@ export { AttributePricesResource } from "./resources/attribute-prices";
 export { Buff163Resource } from "./resources/buff163";
 export { HistoryResource } from "./resources/history";
 export { ItemsResource } from "./resources/items";
+export { LiquidityResource } from "./resources/liquidity";
 export { MarketAnalyticsResource } from "./resources/market-analytics";
+export { MarketsResource } from "./resources/markets";
 export { NbboResource } from "./resources/nbbo";
 export { PricingResource } from "./resources/pricing";
 export { RecommendationsResource } from "./resources/recommendations";
@@ -68,6 +71,14 @@ export { StatusResource } from "./resources/status";
 
 // Market id constants
 export { ATTRIBUTE_MARKETS, KNOWN_MARKETS } from "./types/markets";
+
+// Liquidity enums
+export {
+  LIQUIDITY_BADGES,
+  LIQUIDITY_CONFIDENCE,
+  LIQUIDITY_LABELS,
+  SUPPORTED_LIQUIDITY_MARKETS,
+} from "./types/liquidity";
 
 // Utilities
 export { centsToUsd, formatUsd } from "./utils/money";

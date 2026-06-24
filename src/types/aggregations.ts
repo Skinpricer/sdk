@@ -2,8 +2,10 @@ import type { KnownMarket } from "./markets";
 import type { Cents, IsoDateString } from "./shared";
 
 export interface AggregationsParams {
-  /** Canonical item ids (1–100). */
-  ids: string[];
+  /** Canonical item ids (1–100). Provide this or {@link AggregationsParams.marketHashNames}. */
+  ids?: string[];
+  /** Market hash names (1–100). Provide this or {@link AggregationsParams.ids}. */
+  marketHashNames?: string[];
   markets?: KnownMarket[];
 }
 

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_BASE_URL,
+  DEFAULT_PUBLIC_BASE_URL,
   DEFAULT_TIMEOUT_MS,
   resolveConfig,
 } from "../src/config";
@@ -25,6 +26,38 @@ describe("resolveConfig", () => {
     expect(resolved.authScheme).toBe("Bearer");
     expect(resolved.retry).not.toBeNull();
     expect(resolved.userAgent).toMatch(/^skinpricer-sdk\//);
+  });
+
+  it("derives publicBaseUrl from the default pricing host", () => {
+    const resolved = resolveConfig({ apiKey: "k", fetch: noopFetch });
+    expect(resolved.publicBaseUrl).toBe(DEFAULT_PUBLIC_BASE_URL);
+  });
+
+  it("derives publicBaseUrl by swapping pricing. → api. on a custom base", () => {
+    const resolved = resolveConfig({
+      apiKey: "k",
+      baseUrl: "https://pricing.example.com/v1",
+      fetch: noopFetch,
+    });
+    expect(resolved.publicBaseUrl).toBe("https://api.example.com/v1");
+  });
+
+  it("falls back to DEFAULT_PUBLIC_BASE_URL for a non-pricing base", () => {
+    const resolved = resolveConfig({
+      apiKey: "k",
+      baseUrl: "https://gateway.example.com/v1",
+      fetch: noopFetch,
+    });
+    expect(resolved.publicBaseUrl).toBe(DEFAULT_PUBLIC_BASE_URL);
+  });
+
+  it("uses an explicit publicBaseUrl override verbatim", () => {
+    const resolved = resolveConfig({
+      apiKey: "k",
+      publicBaseUrl: "https://custom.example.com/v2",
+      fetch: noopFetch,
+    });
+    expect(resolved.publicBaseUrl).toBe("https://custom.example.com/v2");
   });
 
   it("strips trailing slashes from baseUrl", () => {

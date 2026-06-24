@@ -6,7 +6,9 @@ import { AttributePricesResource } from "./resources/attribute-prices";
 import { Buff163Resource } from "./resources/buff163";
 import { HistoryResource } from "./resources/history";
 import { ItemsResource } from "./resources/items";
+import { LiquidityResource } from "./resources/liquidity";
 import { MarketAnalyticsResource } from "./resources/market-analytics";
+import { MarketsResource } from "./resources/markets";
 import { NbboResource } from "./resources/nbbo";
 import { PricingResource } from "./resources/pricing";
 import { RecommendationsResource } from "./resources/recommendations";
@@ -24,6 +26,8 @@ export class SkinpricerClient {
   readonly marketAnalytics: MarketAnalyticsResource;
   readonly attributePrices: AttributePricesResource;
   readonly buff163: Buff163Resource;
+  readonly liquidity: LiquidityResource;
+  readonly markets: MarketsResource;
 
   private readonly httpClient: HttpClient;
 
@@ -41,5 +45,7 @@ export class SkinpricerClient {
     this.marketAnalytics = new MarketAnalyticsResource(this.httpClient);
     this.attributePrices = new AttributePricesResource(this.httpClient);
     this.buff163 = new Buff163Resource(this.httpClient);
+    this.liquidity = new LiquidityResource(this.httpClient);
+    this.markets = new MarketsResource(this.httpClient);
   }
 }

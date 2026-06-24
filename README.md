@@ -68,6 +68,8 @@ const client = new SkinpricerClient({
 | `client.marketAnalytics` | `get`                        |
 | `client.attributePrices` | `latest`, `history`          |
 | `client.buff163`         | `latest`, `history`          |
+| `client.liquidity`       | `get`, `summary`, `batch`, `bulk`, `manifest` |
+| `client.markets`         | `health`                     |
 
 Every method accepts an optional trailing `RequestOptions` (`{ signal, timeoutMs, retry }`).
 
@@ -149,6 +151,14 @@ for await (const bucket of client.attributePrices.latestEach({
 ```ts
 const { items } = await client.aggregations.minPricesAll(thousandsOfIds, {
   concurrency: 5,
+});
+```
+
+`minPrices` / `maxOrders` also accept `marketHashNames` instead of `ids` (provide either one):
+
+```ts
+await client.aggregations.minPrices({
+  marketHashNames: ["AK-47 | Redline (Field-Tested)"],
 });
 ```
 

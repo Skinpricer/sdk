@@ -19,7 +19,7 @@ export interface AggregationsBatchParams {
 }
 
 export class AggregationsResource extends BaseResource {
-  /** GET /v1/aggregations/min-prices — minimum sell price per market (max 100 ids). */
+  /** GET /v1/aggregations/min-prices — minimum sell price per market. Pass up to 100 `ids` or `marketHashNames`. */
   minPrices(
     params: AggregationsParams,
     options?: RequestOptions,
@@ -28,13 +28,17 @@ export class AggregationsResource extends BaseResource {
       {
         method: "GET",
         path: "/aggregations/min-prices",
-        query: { ids: params.ids, markets: params.markets },
+        query: {
+          ids: params.ids,
+          marketHashNames: params.marketHashNames,
+          markets: params.markets,
+        },
       },
       options,
     );
   }
 
-  /** GET /v1/aggregations/max-orders — maximum buy order per market (max 100 ids). */
+  /** GET /v1/aggregations/max-orders — maximum buy order per market. Pass up to 100 `ids` or `marketHashNames`. */
   maxOrders(
     params: AggregationsParams,
     options?: RequestOptions,
@@ -43,7 +47,11 @@ export class AggregationsResource extends BaseResource {
       {
         method: "GET",
         path: "/aggregations/max-orders",
-        query: { ids: params.ids, markets: params.markets },
+        query: {
+          ids: params.ids,
+          marketHashNames: params.marketHashNames,
+          markets: params.markets,
+        },
       },
       options,
     );

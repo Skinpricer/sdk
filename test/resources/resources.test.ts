@@ -193,3 +193,84 @@ describe("resource routing — all 24 endpoints", () => {
     expect(BASE).toContain("skinpricer");
   });
 });
+
+describe("resource routing — liquidity, markets, aggregations by name", () => {
+  it("aggregations.minPrices by marketHashNames", async () => {
+    const { client, mock } = setup({ items: [] });
+    await client.aggregations.minPrices({
+      marketHashNames: [MHN, "AWP | Asiimov (Field-Tested)"],
+    });
+    const url = lastUrl(mock);
+    expect(url.pathname).toBe("/v1/aggregations/min-prices");
+    expect(url.searchParams.get("marketHashNames")).toBe(
+      `${MHN},AWP | Asiimov (Field-Tested)`,
+    );
+    expect(url.searchParams.get("ids")).toBeNull();
+  });
+
+  it("aggregations.maxOrders by marketHashNames", async () => {
+    const { client, mock } = setup({ items: [] });
+    await client.aggregations.maxOrders({ marketHashNames: [MHN] });
+    const url = lastUrl(mock);
+    expect(url.pathname).toBe("/v1/aggregations/max-orders");
+    expect(url.searchParams.get("marketHashNames")).toBe(MHN);
+  });
+
+  it("liquidity.get with askPrice + market", async () => {
+    const { client, mock } = setup();
+    await client.liquidity.get(MHN, { askPrice: 2500, market: "csfloat" });
+    const url = lastUrl(mock);
+    expect(url.pathname).toBe(`/v1/liquidity/${ENCODED_MHN}`);
+    expect(url.searchParams.get("askPrice")).toBe("2500");
+    expect(url.searchParams.get("market")).toBe("csfloat");
+  });
+
+  it("liquidity.summary", async () => {
+    const { client, mock } = setup();
+    await client.liquidity.summary(MHN);
+    expect(lastUrl(mock).pathname).toBe(`/v1/liquidity/summary/${ENCODED_MHN}`);
+  });
+
+  it("liquidity.batch POSTs a marketHashNames body", async () => {
+    const { client, mock } = setup({ results: [], notFound: [], requested: 0 });
+    await client.liquidity.batch({ marketHashNames: [MHN], market: "skinport" });
+    const call = mock.calls[0];
+    expect(call?.method).toBe("POST");
+    expect(new URL(call!.url).pathname).toBe("/v1/liquidity/batch");
+    expect(JSON.parse(call!.body ?? "{}")).toEqual({
+      marketHashNames: [MHN],
+      market: "skinport",
+    });
+  });
+
+  it("liquidity.bulk and manifest", async () => {
+    const { client, mock } = setup({ version: "1", items: {} });
+    await client.liquidity.bulk();
+    expect(lastUrl(mock).pathname).toBe("/v1/liquidity/items");
+    await client.liquidity.manifest();
+    expect(lastUrl(mock).pathname).toBe("/v1/liquidity/items/manifest");
+  });
+
+  it("markets.health routes to the public api host", async () => {
+    const { client, mock } = setup([]);
+    const rows = await client.markets.health();
+    const url = lastUrl(mock);
+    expect(url.origin).toBe("https://api.skinpricer.com");
+    expect(url.pathname).toBe("/v1/markets/health");
+    expect(Array.isArray(rows)).toBe(true);
+  });
+
+  it("markets.health derives the public host from a custom pricing base", async () => {
+    const { mock } = setup([]);
+    const client = new SkinpricerClient({
+      apiKey: "sk_test_abc",
+      fetch: mock.fetch,
+      baseUrl: "https://pricing.example.com/v1",
+      retry: false,
+    });
+    await client.markets.health();
+    const url = lastUrl(mock);
+    expect(url.origin).toBe("https://api.example.com");
+    expect(url.pathname).toBe("/v1/markets/health");
+  });
+});

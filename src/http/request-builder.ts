@@ -8,6 +8,8 @@ export interface BuildRequestInput {
   path: string;
   query?: QueryParams;
   body?: unknown;
+  /** Overrides `config.baseUrl` for this request (e.g. keyless public-service endpoints). */
+  baseUrl?: string;
 }
 
 export interface PreparedRequest {
@@ -22,7 +24,7 @@ export function buildRequest(
   input: BuildRequestInput,
 ): PreparedRequest {
   const queryString = input.query ? serializeQuery(input.query) : "";
-  const url = joinUrl(config.baseUrl, input.path) + queryString;
+  const url = joinUrl(input.baseUrl ?? config.baseUrl, input.path) + queryString;
 
   const headers: Record<string, string> = {
     Accept: "application/json",

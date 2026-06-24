@@ -41,6 +41,11 @@ export class HttpClient {
 
   constructor(private readonly config: ResolvedConfig) {}
 
+  /** Base URL for keyless public-service endpoints (see {@link ResolvedConfig.publicBaseUrl}). */
+  get publicBaseUrl(): string {
+    return this.config.publicBaseUrl;
+  }
+
   async request<T>(
     input: BuildRequestInput,
     options: RequestOptions = {},

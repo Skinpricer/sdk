@@ -10,3 +10,4 @@ export type * from "./arbitrage";
 export type * from "./recommendations";
 export type * from "./market-analytics";
 export type * from "./attribute-prices";
+export type * from "./liquidity";

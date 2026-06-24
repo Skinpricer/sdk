@@ -18,6 +18,14 @@ export interface ClientConfig {
   apiKey: string;
   /** Base URL including the version prefix. */
   baseUrl?: string;
+  /**
+   * Base URL (incl. version prefix) for the keyless public-service endpoints
+   * that live off the pricing host — currently only `markets.health`. Defaults
+   * to deriving the `api.` host from {@link baseUrl} (e.g.
+   * `pricing.skinpricer.com` → `api.skinpricer.com`), falling back to
+   * `https://api.skinpricer.com/v1`.
+   */
+  publicBaseUrl?: string;
   /** Custom `fetch` implementation. Defaults to the global `fetch`. */
   fetch?: FetchLike;
   /** Per-request timeout in ms. Defaults to 30000; `0` disables it. */
@@ -38,6 +46,7 @@ export interface ClientConfig {
 export interface ResolvedConfig {
   apiKey: string;
   baseUrl: string;
+  publicBaseUrl: string;
   fetch: FetchLike;
   timeoutMs: number;
   retry: RetryConfig | null;
@@ -49,7 +58,26 @@ export interface ResolvedConfig {
 }
 
 export const DEFAULT_BASE_URL = "https://pricing.skinpricer.com/v1";
+export const DEFAULT_PUBLIC_BASE_URL = "https://api.skinpricer.com/v1";
 export const DEFAULT_TIMEOUT_MS = 30_000;
+
+/**
+ * Derives the public-service base from the pricing base by swapping the leading
+ * `pricing.` host label for `api.`. Falls back to {@link DEFAULT_PUBLIC_BASE_URL}
+ * for any non-`pricing.` base.
+ */
+function derivePublicBaseUrl(baseUrl: string): string {
+  try {
+    const parsed = new URL(baseUrl);
+    if (parsed.hostname.startsWith("pricing.")) {
+      parsed.hostname = `api.${parsed.hostname.slice("pricing.".length)}`;
+      return parsed.toString().replace(/\/+$/, "");
+    }
+  } catch {
+    // fall through to the default
+  }
+  return DEFAULT_PUBLIC_BASE_URL;
+}
 
 export const DEFAULT_RETRY: RetryConfig = {
   maxRetries: 2,
@@ -102,9 +130,14 @@ export function resolveConfig(config: ClientConfig): ResolvedConfig {
     );
   }
 
+  const baseUrl = normalizeBaseUrl(config.baseUrl ?? DEFAULT_BASE_URL);
+
   return {
     apiKey: config.apiKey,
-    baseUrl: normalizeBaseUrl(config.baseUrl ?? DEFAULT_BASE_URL),
+    baseUrl,
+    publicBaseUrl: normalizeBaseUrl(
+      config.publicBaseUrl ?? derivePublicBaseUrl(baseUrl),
+    ),
     fetch: resolveFetch(config.fetch),
     timeoutMs: config.timeoutMs ?? DEFAULT_TIMEOUT_MS,
     retry: resolveRetry(config.retry),
