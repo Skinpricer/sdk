@@ -76,6 +76,20 @@ BUFF163 attribute endpoints, freshness/latency status, and bulk item/liquidity
 exports remain on the default CS2 client. They are absent from game-scoped clients.
 Plan permissions apply to each endpoint. A game scope does not add features to a plan.
 
+CS2 arbitrage `spreadBps` and `spreadCents` describe gross price differences.
+`netSpreadBps` and `estimatedNetCents` account for estimated seller commission;
+withdrawal and transfer costs are excluded. Both `minSpreadBps` and
+`sort: "spreadBps"` use the spread after seller commission. Fee metadata is
+available as `sellerFeeBps`, `feeModelVersion`, and optional `assumedFees`.
+
+Each quote's `priceLevelQuantity` describes verified quantity at its displayed
+price, or `null` when unknown. `quoteSize` is the market's reported aggregate
+quantity. Arbitrage results can return `null` for `maxTradableQuantity` and
+`estimatedNotionalCents` when capacity at the displayed prices is unverified.
+Handle those values before calculations or display. `minNotionalCents` defaults
+to `1000`; positive values require verified capacity. Set it to `0` to also
+include indicative price pairs with unknown capacity.
+
 History responses include `effectiveInterval`, the actual bucket width of the
 returned data: `10m`, `1h`, or `1d`. It can differ from the requested interval.
 Sell-offer history describes observed asks. Its maximum can include extreme
