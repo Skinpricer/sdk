@@ -1,3 +1,4 @@
+import type { Game } from "./games";
 import type { Cents, IsoDateString } from "./shared";
 
 // Liquidity & expected time-to-sell types (`/v1/liquidity/*`). Prices are USD cents.
@@ -10,6 +11,7 @@ export const LIQUIDITY_BADGES = [
   "VERY_ILLIQUID",
   "EXTREMELY_ILLIQUID",
   "UNTRADED",
+  "INSUFFICIENT_DATA",
 ] as const;
 export type LiquidityBadge = (typeof LIQUIDITY_BADGES)[number];
 
@@ -39,16 +41,25 @@ export const SUPPORTED_LIQUIDITY_MARKETS = [
   "skinport",
   "marketcsgo",
   "dmarket",
-  "csdeals",
+  "steamcommunity",
   "csfloat",
 ] as const;
 export type SupportedLiquidityMarket =
   (typeof SUPPORTED_LIQUIDITY_MARKETS)[number];
 
-export interface LiquidityParams {
+export const SUPPORTED_RUST_LIQUIDITY_MARKETS = ["rusttm", "skinport"] as const;
+export type SupportedRustLiquidityMarket =
+  (typeof SUPPORTED_RUST_LIQUIDITY_MARKETS)[number];
+export type LiquidityMarketForGame<G extends Game> = G extends "rust"
+  ? SupportedRustLiquidityMarket
+  : SupportedLiquidityMarket;
+
+export interface LiquidityParams<
+  Market extends string = SupportedLiquidityMarket,
+> {
   /** Hypothetical ask (USD cents) to estimate against; defaults to the best ask. */
   askPrice?: Cents;
-  market?: SupportedLiquidityMarket;
+  market?: Market;
 }
 
 /** Per-market row; every metric is null when that market has no data. */
@@ -94,7 +105,7 @@ export interface LiquiditySummaryResponse {
   marketHashName: string;
   liquidityBadge: LiquidityBadge;
   liquidity: LiquidityLabel;
-  /** Human time-to-sell, e.g. `"2 - 6 hours"` (`"No recent sales"` when untraded). */
+  /** Human time-to-sell, e.g. `"2 - 6 hours"` (`"Insufficient data"` when no estimate is available). */
   estimatedSaleTime: string;
   confidence: LiquidityConfidence;
   /** 0-100, higher sells faster; null when untraded. */
@@ -104,9 +115,11 @@ export interface LiquiditySummaryResponse {
 }
 
 /** Request body for `POST /v1/liquidity/batch` (1-100 names). */
-export interface LiquidityBatchBody {
+export interface LiquidityBatchBody<
+  Market extends string = SupportedLiquidityMarket,
+> {
   marketHashNames: string[];
-  market?: SupportedLiquidityMarket;
+  market?: Market;
 }
 
 /** `POST /v1/liquidity/batch` — up to 100 full results in one call. */

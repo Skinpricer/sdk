@@ -11,3 +11,6 @@ export type * from "./recommendations";
 export type * from "./market-analytics";
 export type * from "./attribute-prices";
 export type * from "./liquidity";
+export type * from "./games";
+export type * from "./schema";
+export type * from "./inventory";

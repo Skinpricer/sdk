@@ -1,4 +1,7 @@
+export { InventoryResource } from "./resources/inventory";
 // Client
+export { GameClient } from "./game-client";
+export { SchemaResource } from "./resources/schema";
 export { SkinpricerClient } from "./client";
 export {
   DEFAULT_BASE_URL,
@@ -78,6 +81,7 @@ export {
   LIQUIDITY_CONFIDENCE,
   LIQUIDITY_LABELS,
   SUPPORTED_LIQUIDITY_MARKETS,
+  SUPPORTED_RUST_LIQUIDITY_MARKETS,
 } from "./types/liquidity";
 
 // Utilities

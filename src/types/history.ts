@@ -49,6 +49,8 @@ export interface PriceHistoryResponse {
   history: PriceHistoryPoint[];
   listingType: HistoryListingType;
   salesWindow: SalesHistoryWindow | null;
+  /** Actual returned bucket width, which may differ from the requested interval. */
+  effectiveInterval: "10m" | "1h" | "1d";
 }
 
 export interface MarketSeries {
@@ -63,4 +65,6 @@ export interface PriceHistoryByMarketResponse {
   series: MarketSeries[];
   listingType: HistoryListingType;
   salesWindow: SalesHistoryWindow | null;
+  /** Actual returned bucket width, which may differ from the requested interval. */
+  effectiveInterval: "10m" | "1h" | "1d";
 }

@@ -1,11 +1,4 @@
-/**
- * Market ids the API integrates — the canonical join keys returned by
- * `GET /v1/markets/health` and used across pricing / nbbo / aggregation
- * responses. Kept in sync with that registry (18 integrated markets as of
- * 2026-06). A market id appears here once the backend integrates it, regardless
- * of live/degraded/stale status; ids prepared but not yet ingesting (e.g.
- * bitskins, skinbaron) are intentionally excluded until they show in health.
- */
+/** Market identifiers used in pricing responses. Availability differs by game. */
 export const KNOWN_MARKETS = [
   "skinport",
   "skindeck",
@@ -25,6 +18,9 @@ export const KNOWN_MARKETS = [
   "tradeit-store",
   "tradeit-trade",
   "steamcommunity",
+  "mannco-store",
+  "rusttm",
+  "rustskins",
 ] as const;
 
 /** A known market id, or any other string. */
@@ -61,14 +57,30 @@ export interface MarketHealthRow {
   id: string;
   status: MarketRegistryStatus;
   /** ISO timestamp of the latest ingest event from this marketplace. */
-  lastEventAt: string;
-  listingsCount: number;
+  lastEventAt: string | null;
+  /** Null when the source does not establish an inventory count. */
+  listingsCount: number | null;
+  freshnessCoveragePct?: number | null;
+  listingsCountBasis?:
+    | "observed-listings"
+    | "observed-units"
+    | "observed-listings-subset"
+    | "observed-empty"
+    | null;
+  freshnessCoverageBasis?: {
+    kind: "observed-active-quote-identities";
+    activeWindowHours: number;
+    freshWindowMinutes: number;
+    activeQuotes: number;
+    freshQuotes: number;
+    collectionMode: "rolling-catalogue" | "snapshot-feed" | "unspecified";
+  };
   /**
-   * Optional 48 × 5-min uptime tiers covering the trailing 4h. Each entry is
-   * 0 (down) / 1 (degraded) / 2 (live), oldest first. Absent when the backend
-   * doesn't yet emit per-bucket health.
+   * 48 bars, oldest first: CS2 uses five-minute ingest health bars over four hours;
+   * Rust uses half-hour pricing freshness bars over 24 hours. Values are
+   * 0 (stale), 1 (degraded), 2 (fresh), or null (unknown). Not provider uptime.
    */
-  healthBars?: readonly number[];
+  healthBars?: readonly (number | null)[];
 }
 
 /** `GET /v1/markets/health` — a plain array of per-market health rows. */

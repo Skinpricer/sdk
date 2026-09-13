@@ -46,6 +46,15 @@ export class HttpClient {
     return this.config.publicBaseUrl;
   }
 
+  /** Selects an API version while retaining a configured gateway prefix. */
+  versionedBaseUrl(version: "v2", baseUrl = this.config.baseUrl): string {
+    const url = new URL(baseUrl);
+    url.pathname = /\/v[0-9]+$/.test(url.pathname)
+      ? url.pathname.replace(/\/v[0-9]+$/, `/${version}`)
+      : `${url.pathname.replace(/\/$/, "")}/${version}`;
+    return url.toString().replace(/\/$/, "");
+  }
+
   async request<T>(
     input: BuildRequestInput,
     options: RequestOptions = {},
@@ -68,54 +77,18 @@ export class HttpClient {
         attempt,
       });
 
-      let response: Response;
       try {
-        response = await this.config.fetch(prepared.url, {
+        const response = await this.config.fetch(prepared.url, {
           method: prepared.method,
           headers: prepared.headers,
           body: prepared.body,
           signal: handle.signal,
         });
-      } catch (error) {
+        const parsed = await parseResponse<T>(
+          response,
+          input.ifNoneMatch !== undefined,
+        );
         handle.cleanup();
-
-        if (callerSignal?.aborted && !handle.didTimeout()) {
-          throw abortError(callerSignal);
-        }
-
-        if (
-          retry &&
-          shouldRetry({ method: input.method, attempt, retry, status: null })
-        ) {
-          const delayMs = retryDelayMs({
-            attempt,
-            retry,
-            retryAfterSeconds: null,
-          });
-          await runHook(hooks.onRetry, {
-            method: input.method,
-            url: prepared.url,
-            attempt,
-            delayMs,
-            status: null,
-          });
-          await sleep(delayMs, callerSignal);
-          attempt += 1;
-          continue;
-        }
-
-        if (handle.didTimeout()) {
-          throw new TimeoutError(`Request timed out after ${timeoutMs}ms`, {
-            cause: error,
-          });
-        }
-        throw new NetworkError(networkMessage(error), { cause: error });
-      }
-
-      handle.cleanup();
-
-      try {
-        const parsed = await parseResponse<T>(response);
         this.recordRateLimit(parsed.meta.rateLimit);
         await runHook(hooks.onResponse, {
           method: input.method,
@@ -126,38 +99,42 @@ export class HttpClient {
         });
         return parsed;
       } catch (error) {
-        if (error instanceof RateLimitError) {
-          this.recordRateLimit(error.rateLimit, error.retryAfterSeconds);
+        handle.cleanup();
+        if (callerSignal?.aborted && !handle.didTimeout())
+          throw abortError(callerSignal);
+        const failure = handle.didTimeout()
+          ? new TimeoutError(`Request timed out after ${timeoutMs}ms`, {
+              cause: error,
+            })
+          : error instanceof SkinpricerError
+            ? error
+            : new NetworkError(networkMessage(error), { cause: error });
+        if (failure instanceof RateLimitError) {
+          this.recordRateLimit(failure.rateLimit, failure.retryAfterSeconds);
         }
+        const status = failure.status ?? null;
         if (
-          error instanceof SkinpricerError &&
-          error.status !== undefined &&
           retry &&
-          shouldRetry({
-            method: input.method,
-            attempt,
-            retry,
-            status: error.status,
-          })
+          shouldRetry({ method: input.method, attempt, retry, status })
         ) {
           const retryAfterSeconds =
-            error instanceof RateLimitError
-              ? error.retryAfterSeconds
-              : (error.rateLimit?.retryAfterSeconds ?? null);
+            failure instanceof RateLimitError
+              ? failure.retryAfterSeconds
+              : (failure.rateLimit?.retryAfterSeconds ?? null);
           const delayMs = retryDelayMs({ attempt, retry, retryAfterSeconds });
           await runHook(hooks.onRetry, {
             method: input.method,
             url: prepared.url,
             attempt,
             delayMs,
-            status: error.status,
-            error,
+            status,
+            error: failure,
           });
           await sleep(delayMs, callerSignal);
           attempt += 1;
           continue;
         }
-        throw error;
+        throw failure;
       }
     }
   }
