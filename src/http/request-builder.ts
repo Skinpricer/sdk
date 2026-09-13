@@ -4,6 +4,8 @@ import { serializeQuery, type QueryParams } from "./query";
 import type { HttpMethod } from "./types";
 
 export interface BuildRequestInput {
+  authenticated?: boolean;
+  ifNoneMatch?: string;
   method: HttpMethod;
   path: string;
   query?: QueryParams;
@@ -24,13 +26,18 @@ export function buildRequest(
   input: BuildRequestInput,
 ): PreparedRequest {
   const queryString = input.query ? serializeQuery(input.query) : "";
-  const url = joinUrl(input.baseUrl ?? config.baseUrl, input.path) + queryString;
+  const url =
+    joinUrl(input.baseUrl ?? config.baseUrl, input.path) + queryString;
 
   const headers: Record<string, string> = {
     Accept: "application/json",
     "User-Agent": config.userAgent,
     "X-Skinpricer-Client": config.userAgent,
-    ...config.headers,
+    ...Object.fromEntries(
+      Object.entries(config.headers).filter(
+        ([name]) => name.toLowerCase() !== "authorization",
+      ),
+    ),
   };
 
   let body: string | undefined;
@@ -39,7 +46,10 @@ export function buildRequest(
     headers["Content-Type"] = "application/json";
   }
 
-  headers["Authorization"] = `${config.authScheme} ${config.apiKey}`;
+  if (input.authenticated !== false)
+    headers["Authorization"] = `${config.authScheme} ${config.apiKey}`;
+  if (input.ifNoneMatch !== undefined)
+    headers["If-None-Match"] = input.ifNoneMatch;
 
   const prepared: PreparedRequest = { url, method: input.method, headers };
   if (body !== undefined) prepared.body = body;

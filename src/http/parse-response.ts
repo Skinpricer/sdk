@@ -27,8 +27,11 @@ function tryJsonParse(text: string): unknown {
 
 export async function parseResponse<T>(
   response: Response,
+  allowNotModified = false,
 ): Promise<HttpResponse<T>> {
   const meta = buildMeta(response);
+  if (allowNotModified && response.status === 304)
+    return { data: null as T, meta };
   const text = await response.text();
 
   if (response.ok) {

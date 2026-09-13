@@ -7,6 +7,7 @@ import type {
   LiquidityParams,
   LiquidityResponse,
   LiquiditySummaryResponse,
+  SupportedLiquidityMarket,
 } from "../types/liquidity";
 import { encodePathSegment } from "../utils/url";
 import { BaseResource } from "./resource";
@@ -16,11 +17,13 @@ import { BaseResource } from "./resource";
  * sales velocity. The single + summary + batch endpoints are Pro; the bulk map
  * + manifest are Enterprise.
  */
-export class LiquidityResource extends BaseResource {
+export class ItemLiquidityResource<
+  Market extends string = SupportedLiquidityMarket,
+> extends BaseResource {
   /** `GET /v1/liquidity/:marketHashName` — full liquidity model for one item. */
   get(
     marketHashName: string,
-    params: LiquidityParams = {},
+    params: LiquidityParams<Market> = {},
     options?: RequestOptions,
   ): Promise<LiquidityResponse> {
     return this.call<LiquidityResponse>(
@@ -36,7 +39,7 @@ export class LiquidityResource extends BaseResource {
   /** `GET /v1/liquidity/summary/:marketHashName` — slim badge-only projection. */
   summary(
     marketHashName: string,
-    params: LiquidityParams = {},
+    params: LiquidityParams<Market> = {},
     options?: RequestOptions,
   ): Promise<LiquiditySummaryResponse> {
     return this.call<LiquiditySummaryResponse>(
@@ -51,7 +54,7 @@ export class LiquidityResource extends BaseResource {
 
   /** `POST /v1/liquidity/batch` — score up to 100 items in one call. */
   batch(
-    body: LiquidityBatchBody,
+    body: LiquidityBatchBody<Market>,
     options?: RequestOptions,
   ): Promise<LiquidityBatchResponse> {
     return this.call<LiquidityBatchResponse>(
@@ -63,7 +66,10 @@ export class LiquidityResource extends BaseResource {
       options,
     );
   }
+}
 
+/** CS2 liquidity, including Enterprise bulk exports. */
+export class LiquidityResource extends ItemLiquidityResource {
   /**
    * `GET /v1/liquidity/items` — Enterprise: the whole-catalog liquidity map,
    * rematerialized every ~10 minutes. Poll {@link manifest} and compare

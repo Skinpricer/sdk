@@ -12,7 +12,12 @@ export class MarketsResource extends BaseResource {
   health(options?: RequestOptions): Promise<MarketHealthResponse> {
     return this.call<MarketHealthResponse>(
       // Keyless: served by the public `api.` host, not the pricing base.
-      { method: "GET", path: "/markets/health", baseUrl: this.http.publicBaseUrl },
+      {
+        method: "GET",
+        authenticated: false,
+        path: "/markets/health",
+        baseUrl: this.http.publicBaseUrl,
+      },
       options,
     );
   }

@@ -1,3 +1,6 @@
+import { GameClient } from "./game-client";
+import type { Game } from "./types/games";
+import { SchemaResource } from "./resources/schema";
 import { type ClientConfig, resolveConfig } from "./config";
 import { HttpClient } from "./http/http-client";
 import { AggregationsResource } from "./resources/aggregations";
@@ -28,6 +31,12 @@ export class SkinpricerClient {
   readonly buff163: Buff163Resource;
   readonly liquidity: LiquidityResource;
   readonly markets: MarketsResource;
+  readonly schema: SchemaResource;
+
+  /** Access the v2 endpoints supported by the selected game. */
+  forGame<G extends Game>(game: G): GameClient<G> {
+    return new GameClient(this.httpClient, game);
+  }
 
   private readonly httpClient: HttpClient;
 
@@ -47,5 +56,6 @@ export class SkinpricerClient {
     this.buff163 = new Buff163Resource(this.httpClient);
     this.liquidity = new LiquidityResource(this.httpClient);
     this.markets = new MarketsResource(this.httpClient);
+    this.schema = new SchemaResource(this.httpClient);
   }
 }
