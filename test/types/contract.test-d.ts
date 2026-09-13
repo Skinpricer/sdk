@@ -1,5 +1,7 @@
 import { expectTypeOf } from "vitest";
 import type {
+  ArbitrageOpportunity,
+  ArbitrageQuote,
   BestPrice,
   KnownMarket,
   CurrentPriceResponse,
@@ -24,6 +26,21 @@ expectTypeOf<MarketAnalyticsResponse>().toHaveProperty("calculated_at");
 expectTypeOf<CurrentPriceResponse["calculatedAt"]>().toEqualTypeOf<string>();
 expectTypeOf<PriceHistoryPoint["avgPrice"]>().toEqualTypeOf<number | null>();
 expectTypeOf<MarketMinPrice["price"]>().toEqualTypeOf<number>();
+expectTypeOf<ArbitrageOpportunity["maxTradableQuantity"]>().toEqualTypeOf<
+  number | null
+>();
+expectTypeOf<ArbitrageOpportunity["estimatedNotionalCents"]>().toEqualTypeOf<
+  number | null
+>();
+expectTypeOf<ArbitrageOpportunity["netSpreadBps"]>().toEqualTypeOf<number>();
+expectTypeOf<ArbitrageOpportunity["sellerFeeBps"]>().toEqualTypeOf<number>();
+expectTypeOf<ArbitrageOpportunity["feeModelVersion"]>().toEqualTypeOf<string>();
+expectTypeOf<ArbitrageOpportunity["assumedFees"]>().toEqualTypeOf<
+  boolean | undefined
+>();
+expectTypeOf<ArbitrageQuote["priceLevelQuantity"]>().toEqualTypeOf<
+  number | null
+>();
 
 expectTypeOf<"buff163">().toMatchTypeOf<KnownMarket>();
 expectTypeOf<"a-brand-new-market">().toMatchTypeOf<KnownMarket>();

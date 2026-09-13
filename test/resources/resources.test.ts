@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { SkinpricerClient } from "../../src";
+import {
+  SkinpricerClient,
+  type ArbitrageOpportunitiesResponse,
+} from "../../src";
 import { getMeta } from "../../src/meta";
 import { createMockFetch } from "../helpers/mock-fetch";
 
@@ -129,12 +132,81 @@ describe("resource routing — all 24 endpoints", () => {
     const { client, mock } = setup({ opportunities: [], totalCandidates: 0 });
     await client.arbitrage.opportunities({
       minSpreadBps: 300,
+      minNotionalCents: 1500,
       sort: "spreadBps",
     });
     const url = lastUrl(mock);
     expect(url.pathname).toBe("/v1/arbitrage/opportunities");
     expect(url.searchParams.get("minSpreadBps")).toBe("300");
+    expect(url.searchParams.get("minNotionalCents")).toBe("1500");
     expect(url.searchParams.get("sort")).toBe("spreadBps");
+  });
+
+  it.each(["minNotionalCents", "minNotional"] as const)(
+    "arbitrage preserves explicit zero %s and unknown capacity",
+    async (minimum) => {
+      const calculatedAt = "2026-09-01T12:00:00.000Z";
+      const response: ArbitrageOpportunitiesResponse = {
+        opportunities: [
+          {
+            canonicalItemId: "item-1",
+            marketHashName: MHN,
+            slug: "ak-47-redline-field-tested",
+            imageUrl: null,
+            buy: {
+              market: "buff163",
+              price: 1000,
+              quoteSize: 10,
+              priceLevelQuantity: null,
+              updatedAt: calculatedAt,
+              isStale: false,
+            },
+            sell: {
+              market: "dmarket",
+              price: 1100,
+              quoteSize: 20,
+              priceLevelQuantity: null,
+              updatedAt: calculatedAt,
+              isStale: false,
+            },
+            spreadBps: 1000,
+            spreadCents: 100,
+            netSpreadBps: 450,
+            estimatedNetCents: 45,
+            sellerFeeBps: 500,
+            feeModelVersion: "exec-fees-v1-estimated",
+            maxTradableQuantity: null,
+            estimatedNotionalCents: null,
+            feeNotes: "Estimated fees apply.",
+            freshness: { buyAgeMs: 0, sellAgeMs: 0 },
+            calculatedAt,
+          },
+        ],
+        totalCandidates: 1,
+        calculatedAt,
+      };
+      const { client, mock } = setup(response);
+      const result = await client.arbitrage.opportunities({ [minimum]: 0 });
+      expect(lastUrl(mock).searchParams.get(minimum)).toBe("0");
+      expect(result.opportunities[0]?.maxTradableQuantity).toBeNull();
+      expect(result.opportunities[0]?.estimatedNotionalCents).toBeNull();
+      expect(result.opportunities[0]?.buy.priceLevelQuantity).toBeNull();
+      expect(result.opportunities[0]?.sell.priceLevelQuantity).toBeNull();
+      expect(result.opportunities[0]?.estimatedNetCents).toBe(45);
+      expect(result.opportunities[0]?.netSpreadBps).toBe(450);
+      expect(result.opportunities[0]?.sellerFeeBps).toBe(500);
+      expect(result.opportunities[0]?.feeModelVersion).toBe(
+        "exec-fees-v1-estimated",
+      );
+      expect(result.opportunities[0]?.assumedFees).toBeUndefined();
+    },
+  );
+
+  it("arbitrage preserves the API default minimum when omitted", async () => {
+    const { client, mock } = setup({ opportunities: [], totalCandidates: 0 });
+    await client.arbitrage.opportunities();
+    expect(lastUrl(mock).searchParams.has("minNotionalCents")).toBe(false);
+    expect(lastUrl(mock).searchParams.has("minNotional")).toBe(false);
   });
 
   it("recommendations.get", async () => {
@@ -233,7 +305,10 @@ describe("resource routing — liquidity, markets, aggregations by name", () => 
 
   it("liquidity.batch POSTs a marketHashNames body", async () => {
     const { client, mock } = setup({ results: [], notFound: [], requested: 0 });
-    await client.liquidity.batch({ marketHashNames: [MHN], market: "skinport" });
+    await client.liquidity.batch({
+      marketHashNames: [MHN],
+      market: "skinport",
+    });
     const call = mock.calls[0];
     expect(call?.method).toBe("POST");
     expect(new URL(call!.url).pathname).toBe("/v1/liquidity/batch");

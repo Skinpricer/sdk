@@ -6,6 +6,7 @@
 - Add catalog snapshots, conditional ETags, single-item lookups, and paginated deltas.
 - Preserve request timeouts and retry handling through response-body reads, and keep public market-health requests free of authentication headers.
 - Correct history bucket intervals, nullable market-health values, insufficient-data liquidity, and supported market types. Strict fixtures and exhaustive switches may need updates.
+- Add arbitrage quantity at each displayed price, seller-net spread, and fee metadata types. Capacity and notional can be `null`; consumers must handle unknown capacity before calculations. Positive minimum notionals require verified capacity, while an explicit zero also includes indicative price pairs.
 - Patch development test tools while preserving Node 18.17 support, and make hosted verification manual.
 
 ## 0.3.0
