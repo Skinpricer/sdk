@@ -1,5 +1,13 @@
 # @skinpricer/sdk
 
+## Unreleased
+
+- Add `client.forGame("cs2" | "rust")` for supported v2 pricing, history, item search, NBBO, liquidity, schema, and market-health endpoints. Existing default CS2 methods remain available.
+- Add catalog snapshots, conditional ETags, single-item lookups, and paginated deltas.
+- Preserve request timeouts and retry handling through response-body reads, and keep public market-health requests free of authentication headers.
+- Correct history bucket intervals, nullable market-health values, insufficient-data liquidity, and supported market types. Strict fixtures and exhaustive switches may need updates.
+- Patch development test tools while preserving Node 18.17 support, and make hosted verification manual.
+
 ## 0.3.0
 
 ### Minor Changes

@@ -8,7 +8,7 @@ import type { CurrentPriceResponse } from "../types/pricing";
 import { BaseResource } from "./resource";
 
 /** Item discovery / search. */
-export class ItemsResource extends BaseResource {
+export class ItemSearchResource extends BaseResource {
   /** GET /v1/items — paginated item search with current pricing. */
   search(
     params: ItemSearchParams = {},
@@ -29,14 +29,6 @@ export class ItemsResource extends BaseResource {
     );
   }
 
-  /** GET /v1/items/all — every tracked item with latest prices (capped, unpaginated). */
-  all(options?: RequestOptions): Promise<AllItemsResponse> {
-    return this.call<AllItemsResponse>(
-      { method: "GET", path: "/items/all" },
-      options,
-    );
-  }
-
   /** Async iterator over every matching item, walking pages. */
   async *searchEach(
     params: ItemSearchParams = {},
@@ -52,5 +44,16 @@ export class ItemsResource extends BaseResource {
       if (next === null || next <= page) return;
       page = next;
     }
+  }
+}
+
+/** CS2 item discovery and full-catalog export. */
+export class ItemsResource extends ItemSearchResource {
+  /** GET /v1/items/all — every tracked item with latest prices (capped, unpaginated). */
+  all(options?: RequestOptions): Promise<AllItemsResponse> {
+    return this.call<AllItemsResponse>(
+      { method: "GET", path: "/items/all" },
+      options,
+    );
   }
 }
