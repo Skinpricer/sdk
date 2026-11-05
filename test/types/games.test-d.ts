@@ -49,3 +49,9 @@ import type { MarketHealthRow } from "../../src";
 expectTypeOf<"observed-empty">().toMatchTypeOf<
   MarketHealthRow["listingsCountBasis"]
 >();
+expectTypeOf<MarketHealthRow["healthBars"]>().toEqualTypeOf<
+  readonly (number | null)[]
+>();
+expectTypeOf<MarketHealthRow["freshnessCoveragePct"]>().toEqualTypeOf<
+  number | null
+>();

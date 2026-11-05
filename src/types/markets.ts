@@ -60,7 +60,8 @@ export interface MarketHealthRow {
   lastEventAt: string | null;
   /** Null when the source does not establish an inventory count. */
   listingsCount: number | null;
-  freshnessCoveragePct?: number | null;
+  /** Percentage (0-100) of the market's quotes that are fresh. Null when it has none. */
+  freshnessCoveragePct: number | null;
   listingsCountBasis?:
     | "observed-listings"
     | "observed-units"
@@ -75,12 +76,19 @@ export interface MarketHealthRow {
     freshQuotes: number;
     collectionMode: "rolling-catalogue" | "snapshot-feed" | "unspecified";
   };
+  /** CS2 coverage of the market's known item catalog. Absent without a reference. */
+  catalogCompleteness?: {
+    basis: "known-market-catalog";
+    referenceItems: number;
+    coveredItems: number;
+    percentage: number;
+    measuredAt: string;
+  };
   /**
-   * 48 bars, oldest first: CS2 uses five-minute ingest health bars over four hours;
-   * Rust uses half-hour pricing freshness bars over 24 hours. Values are
+   * 48 half-hour bars covering the trailing 24 hours, oldest first. Values are
    * 0 (stale), 1 (degraded), 2 (fresh), or null (unknown). Not provider uptime.
    */
-  healthBars?: readonly (number | null)[];
+  healthBars: readonly (number | null)[];
 }
 
 /** `GET /v1/markets/health` — a plain array of per-market health rows. */
