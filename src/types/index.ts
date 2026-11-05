@@ -1,6 +1,7 @@
 export type * from "./shared";
 export type * from "./markets";
 export type * from "./pricing";
+export type * from "./prices";
 export type * from "./history";
 export type * from "./nbbo";
 export type * from "./aggregations";

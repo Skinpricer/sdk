@@ -5,6 +5,8 @@ import {
   type LiquidityBadge,
   type LiquidityBulkManifest,
   type LiquidityBulkResponse,
+  type LatestPriceBidPoint,
+  type LatestPricesResponse,
   type SchemaSnapshotResponse,
 } from "../../src";
 const client = new SkinpricerClient({ apiKey: "test-key" });
@@ -23,6 +25,7 @@ expectTypeOf<keyof SkinpricerClient>().toEqualTypeOf<
   | "liquidity"
   | "markets"
   | "schema"
+  | "prices"
   | "forGame"
 >();
 const rust = client.forGame("rust");
@@ -52,6 +55,19 @@ expectTypeOf(client.liquidity.manifest()).toEqualTypeOf<
 expectTypeOf(client.liquidity.manifest({ ifNoneMatch: '"1"' })).toEqualTypeOf<
   Promise<LiquidityBulkManifest | null>
 >();
+expectTypeOf(client.prices.latestAll({ game: "rust" })).toEqualTypeOf<
+  Promise<LatestPricesResponse>
+>();
+expectTypeOf(
+  client.prices.latestAll({ game: "cs2", ifNoneMatch: 'W/"1"' }),
+).toEqualTypeOf<Promise<LatestPricesResponse | null>>();
+expectTypeOf<LatestPriceBidPoint["quoteSize"]>().toEqualTypeOf<number | null>();
+// @ts-expect-error The snapshot requires a game.
+void client.prices.latestAll({});
+// @ts-expect-error The snapshot accepts only CS2 and Rust.
+void client.prices.latestAll({ game: "tf2" });
+// @ts-expect-error The snapshot is on the root client and takes the game as a parameter.
+void rust.prices;
 // @ts-expect-error Rust has no attribute price endpoint.
 void rust.attributePrices;
 // @ts-expect-error Game-scoped bulk liquidity is unavailable.
