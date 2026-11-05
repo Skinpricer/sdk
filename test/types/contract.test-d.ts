@@ -49,6 +49,18 @@ expectTypeOf<MarketPricePoint["quoteSize"]>().toEqualTypeOf<
 expectTypeOf<MarketPricePoint["totalQuantity"]>().toEqualTypeOf<
   number | null | undefined
 >();
+expectTypeOf<MarketPricePoint["sourceUpdatedAt"]>().toEqualTypeOf<
+  string | null | undefined
+>();
+expectTypeOf<MarketPricePoint["sourceTimeKind"]>().toEqualTypeOf<
+  "payload" | "last_modified" | "cdn_age" | "none" | undefined
+>();
+expectTypeOf<MarketPricePoint["sourceAgeSeconds"]>().toEqualTypeOf<
+  number | null | undefined
+>();
+expectTypeOf<MarketPricePoint["isSourceStale"]>().toEqualTypeOf<
+  boolean | undefined
+>();
 
 expectTypeOf<"buff163">().toMatchTypeOf<KnownMarket>();
 expectTypeOf<"a-brand-new-market">().toMatchTypeOf<KnownMarket>();

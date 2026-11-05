@@ -44,4 +44,34 @@ describe("market price points", () => {
     expect(result.buyOrders?.[0]?.quoteSize).toBeNull();
     expect(result.buyOrders?.[1]?.quoteSize).toBe(0);
   });
+
+  it("returns source times beside the fetch time", async () => {
+    const markets = [
+      {
+        market: "csfloat",
+        price: 1500,
+        currency: "USD",
+        fetchedAt: "2026-09-28T11:57:40.112Z",
+        sourceUpdatedAt: "2026-09-28T11:31:09.000Z",
+        sourceTimeKind: "last_modified",
+        sourceAgeSeconds: 1591,
+        isSourceStale: false,
+      },
+      {
+        market: "buff163",
+        price: 1450,
+        currency: "USD",
+        fetchedAt: "2026-09-28T11:58:00.000Z",
+      },
+    ];
+    const { client } = setup({
+      canonicalItemId: "cm1",
+      name: "AK-47 | Redline (Field-Tested)",
+      markets,
+      calculatedAt: "2026-09-28T12:00:00.000Z",
+    });
+    const result = await client.pricing.get("AK-47 | Redline (Field-Tested)");
+    expect(result.markets).toEqual(markets);
+    expect(result.markets[1]?.sourceAgeSeconds).toBeUndefined();
+  });
 });

@@ -4,10 +4,14 @@ export type IsoDateString = string;
 /** A monetary value in integer USD cents. */
 export type Cents = number;
 
+/** Evidence for a source time: the payload's own timestamp, a `Last-Modified` header, or CDN cache age. */
+export type SourceTimeKind = "payload" | "last_modified" | "cdn_age" | "none";
+
 export interface MarketPricePoint {
   market: string;
   price: Cents;
   currency: string;
+  /** When the price was last read or confirmed still current. Not the age of the data. */
   fetchedAt: IsoDateString;
   ingestedAt?: IsoDateString;
   /** Count the source reports for this quote. Null when unknown, which is not zero. */
@@ -16,6 +20,13 @@ export interface MarketPricePoint {
   totalQuantity?: number | null;
   ingestLatencyMs?: number;
   isStale?: boolean;
+  /** When the source produced this data. Absent or null when unknown. */
+  sourceUpdatedAt?: IsoDateString | null;
+  sourceTimeKind?: SourceTimeKind;
+  /** Age of the source's data when it was read, in seconds. */
+  sourceAgeSeconds?: number | null;
+  /** Whether the source's data is older than 30 minutes. Absent when its age is unknown. */
+  isSourceStale?: boolean;
 }
 
 export interface AggregatePriceData {
