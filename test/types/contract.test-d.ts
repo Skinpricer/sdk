@@ -1,5 +1,6 @@
 import { expectTypeOf } from "vitest";
 import type {
+  AggregatePriceData,
   ArbitrageOpportunity,
   ArbitrageQuote,
   BestPrice,
@@ -60,6 +61,12 @@ expectTypeOf<MarketPricePoint["sourceAgeSeconds"]>().toEqualTypeOf<
 >();
 expectTypeOf<MarketPricePoint["isSourceStale"]>().toEqualTypeOf<
   boolean | undefined
+>();
+expectTypeOf<MarketPricePoint["originalPriceCents"]>().toEqualTypeOf<
+  number | null | undefined
+>();
+expectTypeOf<AggregatePriceData["basis"]>().toEqualTypeOf<
+  "all_venues" | "corroborated_low_cluster" | undefined
 >();
 
 expectTypeOf<"buff163">().toMatchTypeOf<KnownMarket>();
