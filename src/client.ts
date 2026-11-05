@@ -13,6 +13,7 @@ import { LiquidityResource } from "./resources/liquidity";
 import { MarketAnalyticsResource } from "./resources/market-analytics";
 import { MarketsResource } from "./resources/markets";
 import { NbboResource } from "./resources/nbbo";
+import { PricesResource } from "./resources/prices";
 import { PricingResource } from "./resources/pricing";
 import { RecommendationsResource } from "./resources/recommendations";
 import { StatusResource } from "./resources/status";
@@ -32,6 +33,7 @@ export class SkinpricerClient {
   readonly liquidity: LiquidityResource;
   readonly markets: MarketsResource;
   readonly schema: SchemaResource;
+  readonly prices: PricesResource;
 
   /** Access the v2 endpoints supported by the selected game. */
   forGame<G extends Game>(game: G): GameClient<G> {
@@ -57,5 +59,6 @@ export class SkinpricerClient {
     this.liquidity = new LiquidityResource(this.httpClient);
     this.markets = new MarketsResource(this.httpClient);
     this.schema = new SchemaResource(this.httpClient);
+    this.prices = new PricesResource(this.httpClient);
   }
 }

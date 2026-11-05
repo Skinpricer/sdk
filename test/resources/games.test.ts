@@ -103,6 +103,7 @@ describe("game scope", () => {
       "MarketAnalyticsResource",
       "MarketsResource",
       "NbboResource",
+      "PricesResource",
       "PricingResource",
       "RecommendationsResource",
       "SchemaResource",

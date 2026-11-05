@@ -76,6 +76,19 @@ BUFF163 attribute endpoints, freshness/latency status, and bulk item/liquidity
 exports remain on the default CS2 client. They are absent from game-scoped clients.
 Plan permissions apply to each endpoint. A game scope does not add features to a plan.
 
+Pricing `buyOrders[]` entries can report `quoteSize: null` and `totalQuantity: null`
+when a source publishes a best bid without its size. Null means the quantity is
+unknown, while zero is a reported count. The price is still useful for comparison
+but does not establish executable depth or a trade size.
+
+A price point's `fetchedAt` is when the price was last read or confirmed still
+current, so it can be recent while the source's data is older. Where a source
+states when it produced its data, price points add `sourceUpdatedAt`,
+`sourceTimeKind` (`payload`, `last_modified`, `cdn_age` or `none`),
+`sourceAgeSeconds` (the data's age when it was read) and `isSourceStale` (older
+than 30 minutes). Most sources state no such time, so these fields are usually
+absent. Treat an absent value as unknown, not as fresh.
+
 CS2 arbitrage `spreadBps` and `spreadCents` describe gross price differences.
 `netSpreadBps` and `estimatedNetCents` account for estimated seller commission;
 withdrawal and transfer costs are excluded. Both `minSpreadBps` and
@@ -132,6 +145,37 @@ for await (const changed of schema.changesEach({
 to the selected game. Keep the original `since` value while paging, and save the
 returned catalog version only after processing every page.
 
+The CS2 client's `liquidity.bulk()` and `liquidity.manifest()` accept the same
+`{ ifNoneMatch }` first argument and also return `null` for HTTP 304. Pass
+request options to them as the second argument.
+
+## All-item prices
+
+Enterprise plans can read every item of one game in one call. The method is on the
+default client and takes the game as a parameter.
+
+```ts
+const latest = await client.prices.latestAll({ game: "cs2" });
+const etag = getMeta(latest)?.headers.get("etag");
+
+if (etag) {
+  const next = await client.prices.latestAll({
+    game: "cs2",
+    ifNoneMatch: etag,
+  });
+  if (next !== null) {
+    // Replace your cached snapshot with next.
+  }
+}
+```
+
+Each item lists every market's ask in `markets` and bid in `buyOrders`, with
+`bestAsk` and `bestBid`. Items without a servable quote are left out. The response
+is large; runtimes with a built-in `fetch` request and decode gzip themselves, so
+the SDK sets no `Accept-Encoding` header. While no current snapshot exists, the API
+answers 503 with `Retry-After`. GET retries wait for it, up to `retry.maxDelayMs`,
+and the final `ServerError` reports it as `rateLimit.retryAfterSeconds`.
+
 ## Configuration
 
 ```ts
@@ -164,6 +208,7 @@ const client = new SkinpricerClient({
 | `client.liquidity`       | `get`, `summary`, `batch`, `bulk`, `manifest` |
 | `client.markets`         | `health`                                      |
 | `client.schema`          | `snapshot`, `get`, `changes`, `changesEach`   |
+| `client.prices`          | `latestAll`                                   |
 
 Every method accepts an optional trailing `RequestOptions` (`{ signal, timeoutMs, retry }`).
 

@@ -1,5 +1,6 @@
 import { expectTypeOf } from "vitest";
 import type {
+  AggregatePriceData,
   ArbitrageOpportunity,
   ArbitrageQuote,
   BestPrice,
@@ -8,6 +9,7 @@ import type {
   MarketAnalyticsResponse,
   MarketFreshness,
   MarketMinPrice,
+  MarketPricePoint,
   NbboBestPrice,
   PriceHistoryPoint,
   RecommendationResponse,
@@ -40,6 +42,31 @@ expectTypeOf<ArbitrageOpportunity["assumedFees"]>().toEqualTypeOf<
 >();
 expectTypeOf<ArbitrageQuote["priceLevelQuantity"]>().toEqualTypeOf<
   number | null
+>();
+
+expectTypeOf<MarketPricePoint["quoteSize"]>().toEqualTypeOf<
+  number | null | undefined
+>();
+expectTypeOf<MarketPricePoint["totalQuantity"]>().toEqualTypeOf<
+  number | null | undefined
+>();
+expectTypeOf<MarketPricePoint["sourceUpdatedAt"]>().toEqualTypeOf<
+  string | null | undefined
+>();
+expectTypeOf<MarketPricePoint["sourceTimeKind"]>().toEqualTypeOf<
+  "payload" | "last_modified" | "cdn_age" | "none" | undefined
+>();
+expectTypeOf<MarketPricePoint["sourceAgeSeconds"]>().toEqualTypeOf<
+  number | null | undefined
+>();
+expectTypeOf<MarketPricePoint["isSourceStale"]>().toEqualTypeOf<
+  boolean | undefined
+>();
+expectTypeOf<MarketPricePoint["originalPriceCents"]>().toEqualTypeOf<
+  number | null | undefined
+>();
+expectTypeOf<AggregatePriceData["basis"]>().toEqualTypeOf<
+  "all_venues" | "corroborated_low_cluster" | undefined
 >();
 
 expectTypeOf<"buff163">().toMatchTypeOf<KnownMarket>();

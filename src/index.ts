@@ -67,6 +67,7 @@ export { LiquidityResource } from "./resources/liquidity";
 export { MarketAnalyticsResource } from "./resources/market-analytics";
 export { MarketsResource } from "./resources/markets";
 export { NbboResource } from "./resources/nbbo";
+export { PricesResource } from "./resources/prices";
 export { PricingResource } from "./resources/pricing";
 export { RecommendationsResource } from "./resources/recommendations";
 export { StatusResource } from "./resources/status";

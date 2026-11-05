@@ -4,6 +4,7 @@ import type {
   LiquidityBatchBody,
   LiquidityBatchResponse,
   LiquidityBulkManifest,
+  LiquidityBulkParams,
   LiquidityBulkResponse,
   LiquidityParams,
   LiquidityResponse,
@@ -88,25 +89,57 @@ export class LiquidityResource extends ItemLiquidityResource {
   }
 
   /**
-   * `GET /v1/liquidity/items` — Enterprise: the whole-catalog liquidity map,
+   * `GET /v1/liquidity/items`. Enterprise: the whole-catalog liquidity map,
    * rematerialized every ~10 minutes. Poll {@link manifest} and compare
    * `version` before refetching this heavier payload.
    */
-  bulk(options?: RequestOptions): Promise<LiquidityBulkResponse> {
-    return this.call<LiquidityBulkResponse>(
-      { method: "GET", path: "/liquidity/items" },
+  bulk(
+    params?: undefined,
+    options?: RequestOptions,
+  ): Promise<LiquidityBulkResponse>;
+  /** A matching conditional ETag returns null. */
+  bulk(
+    params: LiquidityBulkParams,
+    options?: RequestOptions,
+  ): Promise<LiquidityBulkResponse | null>;
+  bulk(
+    params: LiquidityBulkParams = {},
+    options?: RequestOptions,
+  ): Promise<LiquidityBulkResponse | null> {
+    return this.call(
+      {
+        method: "GET",
+        path: "/liquidity/items",
+        ifNoneMatch: params.ifNoneMatch,
+      },
       options,
     );
   }
 
   /**
-   * `GET /v1/liquidity/items/manifest` — Enterprise: a cheap change-probe for
+   * `GET /v1/liquidity/items/manifest`. Enterprise: a cheap change-probe for
    * the {@link bulk} map (`version`, `calculatedAt`, `cadence`, `markets`,
    * `itemCount`). Refetch the bulk map only when `version` changes.
    */
-  manifest(options?: RequestOptions): Promise<LiquidityBulkManifest> {
-    return this.call<LiquidityBulkManifest>(
-      { method: "GET", path: "/liquidity/items/manifest" },
+  manifest(
+    params?: undefined,
+    options?: RequestOptions,
+  ): Promise<LiquidityBulkManifest>;
+  /** A matching conditional ETag returns null. */
+  manifest(
+    params: LiquidityBulkParams,
+    options?: RequestOptions,
+  ): Promise<LiquidityBulkManifest | null>;
+  manifest(
+    params: LiquidityBulkParams = {},
+    options?: RequestOptions,
+  ): Promise<LiquidityBulkManifest | null> {
+    return this.call(
+      {
+        method: "GET",
+        path: "/liquidity/items/manifest",
+        ifNoneMatch: params.ifNoneMatch,
+      },
       options,
     );
   }
