@@ -143,6 +143,11 @@ export interface LiquidityBulkItem {
   variants: Record<string, never>;
 }
 
+export interface LiquidityBulkParams {
+  /** ETag from the preceding response. HTTP 304 returns null. */
+  ifNoneMatch?: string;
+}
+
 /** `GET /v1/liquidity/items/manifest` — cheap change-probe; compare `version` before refetching. */
 export interface LiquidityBulkManifest {
   /** Snapshot version / ETag. */

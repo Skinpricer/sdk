@@ -327,6 +327,25 @@ describe("resource routing — liquidity, markets, aggregations by name", () => 
     expect(lastUrl(mock).pathname).toBe("/v1/liquidity/items/manifest");
   });
 
+  it("liquidity.bulk and manifest return null for an unchanged ETag", async () => {
+    const mock = createMockFetch({ status: 304, headers: { etag: '"7"' } });
+    const client = new SkinpricerClient({
+      apiKey: "sk_test_abc",
+      fetch: mock.fetch,
+      retry: false,
+    });
+    await expect(
+      client.liquidity.bulk({ ifNoneMatch: '"7"' }),
+    ).resolves.toBeNull();
+    await expect(
+      client.liquidity.manifest({ ifNoneMatch: '"7"' }),
+    ).resolves.toBeNull();
+    expect(mock.calls.map((call) => call.headers["if-none-match"])).toEqual([
+      '"7"',
+      '"7"',
+    ]);
+  });
+
   it("liquidity.get rejects the name reserved for the bulk map", async () => {
     const { client, mock } = setup();
     await expect(client.liquidity.get("items")).rejects.toBeInstanceOf(

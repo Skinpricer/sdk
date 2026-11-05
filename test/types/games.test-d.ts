@@ -3,6 +3,8 @@ import {
   SkinpricerClient,
   type PriceHistoryResponse,
   type LiquidityBadge,
+  type LiquidityBulkManifest,
+  type LiquidityBulkResponse,
   type SchemaSnapshotResponse,
 } from "../../src";
 const client = new SkinpricerClient({ apiKey: "test-key" });
@@ -37,6 +39,18 @@ expectTypeOf(client.schema.snapshot()).toEqualTypeOf<
 >();
 expectTypeOf(client.schema.snapshot({ ifNoneMatch: '"1"' })).toEqualTypeOf<
   Promise<SchemaSnapshotResponse | null>
+>();
+expectTypeOf(client.liquidity.bulk()).toEqualTypeOf<
+  Promise<LiquidityBulkResponse>
+>();
+expectTypeOf(client.liquidity.bulk({ ifNoneMatch: '"1"' })).toEqualTypeOf<
+  Promise<LiquidityBulkResponse | null>
+>();
+expectTypeOf(client.liquidity.manifest()).toEqualTypeOf<
+  Promise<LiquidityBulkManifest>
+>();
+expectTypeOf(client.liquidity.manifest({ ifNoneMatch: '"1"' })).toEqualTypeOf<
+  Promise<LiquidityBulkManifest | null>
 >();
 // @ts-expect-error Rust has no attribute price endpoint.
 void rust.attributePrices;

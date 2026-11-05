@@ -145,6 +145,10 @@ for await (const changed of schema.changesEach({
 to the selected game. Keep the original `since` value while paging, and save the
 returned catalog version only after processing every page.
 
+The CS2 client's `liquidity.bulk()` and `liquidity.manifest()` accept the same
+`{ ifNoneMatch }` first argument and also return `null` for HTTP 304. Pass
+request options to them as the second argument.
+
 ## Configuration
 
 ```ts
