@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  ConfigurationError,
   SkinpricerClient,
   type ArbitrageOpportunitiesResponse,
 } from "../../src";
@@ -324,6 +325,42 @@ describe("resource routing — liquidity, markets, aggregations by name", () => 
     expect(lastUrl(mock).pathname).toBe("/v1/liquidity/items");
     await client.liquidity.manifest();
     expect(lastUrl(mock).pathname).toBe("/v1/liquidity/items/manifest");
+  });
+
+  it("liquidity.get rejects the name reserved for the bulk map", async () => {
+    const { client, mock } = setup();
+    await expect(client.liquidity.get("items")).rejects.toBeInstanceOf(
+      ConfigurationError,
+    );
+    expect(mock.calls).toHaveLength(0);
+  });
+
+  it('scoped liquidity.get keeps "items" as an item name', async () => {
+    const { client, mock } = setup();
+    await client.forGame("rust").liquidity.get("items");
+    expect(lastUrl(mock).pathname).toBe("/v2/liquidity/items");
+  });
+
+  it('rejects empty, "." and ".." path segments before sending', async () => {
+    const { client, mock } = setup();
+    for (const name of ["", ".", ".."]) {
+      await expect(client.pricing.get(name)).rejects.toBeInstanceOf(
+        ConfigurationError,
+      );
+      await expect(client.schema.get(name)).rejects.toBeInstanceOf(
+        ConfigurationError,
+      );
+    }
+    await expect(
+      client.forGame("rust").schema.get(".."),
+    ).rejects.toBeInstanceOf(ConfigurationError);
+    expect(mock.calls).toHaveLength(0);
+  });
+
+  it("allows dots inside a segment", async () => {
+    const { client, mock } = setup();
+    await client.pricing.get("...");
+    expect(lastUrl(mock).pathname).toBe("/v1/pricing/...");
   });
 
   it("markets.health routes to the public api host", async () => {
