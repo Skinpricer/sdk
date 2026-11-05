@@ -10,8 +10,10 @@ export interface MarketPricePoint {
   currency: string;
   fetchedAt: IsoDateString;
   ingestedAt?: IsoDateString;
-  quoteSize?: number;
-  totalQuantity?: number;
+  /** Count the source reports for this quote. Null when unknown, which is not zero. */
+  quoteSize?: number | null;
+  /** Quantity across bid price levels. Null when unknown. */
+  totalQuantity?: number | null;
   ingestLatencyMs?: number;
   isStale?: boolean;
 }

@@ -8,6 +8,7 @@ import type {
   MarketAnalyticsResponse,
   MarketFreshness,
   MarketMinPrice,
+  MarketPricePoint,
   NbboBestPrice,
   PriceHistoryPoint,
   RecommendationResponse,
@@ -40,6 +41,13 @@ expectTypeOf<ArbitrageOpportunity["assumedFees"]>().toEqualTypeOf<
 >();
 expectTypeOf<ArbitrageQuote["priceLevelQuantity"]>().toEqualTypeOf<
   number | null
+>();
+
+expectTypeOf<MarketPricePoint["quoteSize"]>().toEqualTypeOf<
+  number | null | undefined
+>();
+expectTypeOf<MarketPricePoint["totalQuantity"]>().toEqualTypeOf<
+  number | null | undefined
 >();
 
 expectTypeOf<"buff163">().toMatchTypeOf<KnownMarket>();

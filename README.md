@@ -76,6 +76,11 @@ BUFF163 attribute endpoints, freshness/latency status, and bulk item/liquidity
 exports remain on the default CS2 client. They are absent from game-scoped clients.
 Plan permissions apply to each endpoint. A game scope does not add features to a plan.
 
+Pricing `buyOrders[]` entries can report `quoteSize: null` and `totalQuantity: null`
+when a source publishes a best bid without its size. Null means the quantity is
+unknown, while zero is a reported count. The price is still useful for comparison
+but does not establish executable depth or a trade size.
+
 CS2 arbitrage `spreadBps` and `spreadCents` describe gross price differences.
 `netSpreadBps` and `estimatedNetCents` account for estimated seller commission;
 withdrawal and transfer costs are excluded. Both `minSpreadBps` and
