@@ -1,3 +1,4 @@
+import { ConfigurationError } from "../errors/network-errors";
 import type { RequestOptions } from "../http/http-client";
 import type {
   LiquidityBatchBody,
@@ -70,6 +71,22 @@ export class ItemLiquidityResource<
 
 /** CS2 liquidity, including Enterprise bulk exports. */
 export class LiquidityResource extends ItemLiquidityResource {
+  /** `GET /v1/liquidity/:marketHashName`. `"items"` is reserved for {@link bulk}. */
+  override get(
+    marketHashName: string,
+    params: LiquidityParams<SupportedLiquidityMarket> = {},
+    options?: RequestOptions,
+  ): Promise<LiquidityResponse> {
+    if (marketHashName === "items") {
+      return Promise.reject(
+        new ConfigurationError(
+          '"items" is not an item name. Use `bulk()` for the whole-catalog map.',
+        ),
+      );
+    }
+    return super.get(marketHashName, params, options);
+  }
+
   /**
    * `GET /v1/liquidity/items` — Enterprise: the whole-catalog liquidity map,
    * rematerialized every ~10 minutes. Poll {@link manifest} and compare
