@@ -18,7 +18,7 @@ export interface ArbitrageParams {
   minNotional?: number;
   sort?: ArbitrageSort;
   markets?: KnownMarket[];
-  /** Maximum candidate items to consider (50–2000, default 500). */
+  /** Maximum candidate items to consider (50–1000, default 500). */
   candidateLimit?: number;
 }
 
