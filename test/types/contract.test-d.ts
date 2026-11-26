@@ -5,6 +5,9 @@ import type {
   ArbitrageQuote,
   BestPrice,
   KnownMarket,
+  LiquidityBulkItem,
+  LiquidityResponse,
+  LiquiditySummaryResponse,
   CurrentPriceResponse,
   MarketAnalyticsResponse,
   MarketFreshness,
@@ -68,6 +71,17 @@ expectTypeOf<MarketPricePoint["originalPriceCents"]>().toEqualTypeOf<
 expectTypeOf<AggregatePriceData["basis"]>().toEqualTypeOf<
   "all_venues" | "corroborated_low_cluster" | undefined
 >();
+
+type Payout = "cash" | "wallet" | "bot_rate" | "unknown" | null | undefined;
+expectTypeOf<
+  LiquidityResponse["bestMarketToListPayout"]
+>().toEqualTypeOf<Payout>();
+expectTypeOf<
+  LiquiditySummaryResponse["bestMarketToListPayout"]
+>().toEqualTypeOf<Payout>();
+expectTypeOf<
+  LiquidityBulkItem["bestMarketToListPayout"]
+>().toEqualTypeOf<Payout>();
 
 expectTypeOf<"buff163">().toMatchTypeOf<KnownMarket>();
 expectTypeOf<"a-brand-new-market">().toMatchTypeOf<KnownMarket>();

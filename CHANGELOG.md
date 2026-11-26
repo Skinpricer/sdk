@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Minor Changes
+
+- Add `bestMarketToListPayout` and the `LiquidityPayout` type to the liquidity response, summary and bulk item types. It says whether `bestMarketToList` pays `cash`, `wallet` (Steam Wallet funds, which cannot be withdrawn), `bot_rate` or `unknown`, and is null exactly when `bestMarketToList` is null.
+
 ### Patch Changes
 
 - Document the `candidateLimit` range of `arbitrage.opportunities()` as 50–1000. The API rejects values above 1000 with a 400 error.
