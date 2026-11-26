@@ -25,6 +25,9 @@ export type LiquidityConfidence = (typeof LIQUIDITY_CONFIDENCE)[number];
 
 export type LiquidityCoverage = "full" | "partial" | "none";
 
+/** What a market pays the seller: `cash` (withdrawable), `wallet` (Steam Wallet funds), `bot_rate` (credit at the venue's own rate) or `unknown`. */
+export type LiquidityPayout = "cash" | "wallet" | "bot_rate" | "unknown";
+
 /** Lowercase label form of the badge; `UNTRADED` maps to `"unknown"`, no `"moderate"` tier. */
 export const LIQUIDITY_LABELS = [
   "extremely_liquid",
@@ -84,6 +87,8 @@ export interface LiquidityResponse {
   medianTimeToSellHours: number | null;
   p90TimeToSellHours: number | null;
   bestMarketToList: string | null;
+  /** What `bestMarketToList` pays; null exactly when it is null. Steam Community Market pays Steam Wallet funds, which cannot be withdrawn. */
+  bestMarketToListPayout?: LiquidityPayout | null;
   salesPerDay: number | null;
   activeListings: number | null;
   referenceAskUsdCents: Cents | null;
@@ -111,6 +116,8 @@ export interface LiquiditySummaryResponse {
   /** 0-100, higher sells faster; null when untraded. */
   score: number | null;
   bestMarketToList: string | null;
+  /** What `bestMarketToList` pays; null exactly when it is null. Steam Community Market pays Steam Wallet funds, which cannot be withdrawn. */
+  bestMarketToListPayout?: LiquidityPayout | null;
   calculatedAt: IsoDateString;
 }
 
@@ -139,6 +146,8 @@ export interface LiquidityBulkItem {
   confidence: LiquidityConfidence;
   score: number | null;
   bestMarketToList: string | null;
+  /** What `bestMarketToList` pays; null exactly when it is null. Steam Community Market pays Steam Wallet funds, which cannot be withdrawn. */
+  bestMarketToListPayout?: LiquidityPayout | null;
   /** Reserved; always `{}` for now. */
   variants: Record<string, never>;
 }
