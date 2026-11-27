@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Minor Changes
+
+- Add `sales.daily()` for `GET /v2/sales/daily`: every item's observed sales for one closed UTC day, decompressed into typed `SalesDailyRow` objects, with the file's `etag`, `final` and `receivedThrough`. Pass `ifNoneMatch` to get `null` for an unchanged file.
+
 ### Breaking changes
 
 - The snake_case response fields are gone from the aggregations, market analytics, recommendations, freshness and latency status, and bulk liquidity map types, because the API no longer sends them. Read the camelCase names instead, for example `marketHashName` for `market_hash_name`.

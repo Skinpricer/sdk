@@ -176,6 +176,38 @@ the SDK sets no `Accept-Encoding` header. While no current snapshot exists, the 
 answers 503 with `Retry-After`. GET retries wait for it, up to `retry.maxDelayMs`,
 and the final `ServerError` reports it as `rateLimit.retryAfterSeconds`.
 
+## Daily sales file
+
+Pro and Enterprise plans can download every item's observed sales for one closed
+UTC day. `sales.daily()` decompresses the gzip NDJSON file and returns its rows.
+
+```ts
+const day = await client.sales.daily({ game: "cs2", date: "2026-11-26" });
+
+for (const row of day.rows) {
+  // row.count is null when the market did not state one. That is not zero.
+}
+
+if (!day.final && day.etag) {
+  const update = await client.sales.daily({
+    game: "cs2",
+    date: "2026-11-26",
+    ifNoneMatch: day.etag,
+  });
+  if (update !== null) {
+    // The final build replaced the provisional file.
+  }
+}
+```
+
+A day is first built provisional at about 06:10 UTC the next day (`final: false`)
+and rebuilt once as final about 12 hours later with the sales that arrived late.
+`receivedThrough` is the archive receipt time the file covers. Sales rows
+(`evidence: "sales"`) count observed sales; points rows (`evidence: "points"`) carry
+a market's own statistics. Rows from different markets are never added together,
+and an item or market without a row is unknown for the day. Files are kept for 31
+days; an older or future date is a `NotFoundError` or `ValidationError`.
+
 ## Configuration
 
 ```ts
@@ -209,6 +241,7 @@ const client = new SkinpricerClient({
 | `client.markets`         | `health`                                      |
 | `client.schema`          | `snapshot`, `get`, `changes`, `changesEach`   |
 | `client.prices`          | `latestAll`                                   |
+| `client.sales`           | `daily`                                       |
 
 Response fields are camelCase (`marketHashName`, `updatedAt`). The API no longer
 sends the snake_case aliases (`market_hash_name`, `updated_at`) that SDK 0.5.0

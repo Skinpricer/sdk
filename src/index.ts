@@ -70,6 +70,7 @@ export { NbboResource } from "./resources/nbbo";
 export { PricesResource } from "./resources/prices";
 export { PricingResource } from "./resources/pricing";
 export { RecommendationsResource } from "./resources/recommendations";
+export { SalesResource } from "./resources/sales";
 export { StatusResource } from "./resources/status";
 
 // Market id constants

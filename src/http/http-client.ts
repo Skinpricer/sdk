@@ -9,7 +9,11 @@ import { NetworkError, TimeoutError } from "../errors/network-errors";
 import { runHook } from "../hooks";
 import { abortError } from "../utils/abort";
 import { sleep } from "../utils/sleep";
-import { parseResponse, type HttpResponse } from "./parse-response";
+import {
+  parseResponse,
+  type BodyReader,
+  type HttpResponse,
+} from "./parse-response";
 import type { RateLimitInfo } from "./rate-limit";
 import { buildRequest, type BuildRequestInput } from "./request-builder";
 import { retryDelayMs, shouldRetry } from "./retry";
@@ -58,6 +62,7 @@ export class HttpClient {
   async request<T>(
     input: BuildRequestInput,
     options: RequestOptions = {},
+    readBody?: BodyReader<T>,
   ): Promise<HttpResponse<T>> {
     const prepared = buildRequest(this.config, input);
     const retry = resolveRequestRetry(this.config.retry, options.retry);
@@ -87,6 +92,7 @@ export class HttpClient {
         const parsed = await parseResponse<T>(
           response,
           input.ifNoneMatch !== undefined,
+          readBody,
         );
         handle.cleanup();
         this.recordRateLimit(parsed.meta.rateLimit);

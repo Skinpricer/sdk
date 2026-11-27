@@ -5,6 +5,7 @@ export interface MockResponseInit {
   status?: number;
   json?: unknown;
   text?: string;
+  bytes?: Uint8Array;
   headers?: Record<string, string>;
   throw?: unknown;
   delayMs?: number;
@@ -34,8 +35,10 @@ function headersToObject(init?: HeadersInit): Record<string, string> {
 function toResponse(init: MockResponseInit): Response {
   const status = init.status ?? 200;
   const headers = new Headers(init.headers ?? {});
-  let body: string | null = null;
-  if (init.text !== undefined) {
+  let body: BodyInit | null = null;
+  if (init.bytes !== undefined) {
+    body = new Uint8Array(init.bytes);
+  } else if (init.text !== undefined) {
     body = init.text;
   } else if (init.json !== undefined) {
     body = JSON.stringify(init.json);

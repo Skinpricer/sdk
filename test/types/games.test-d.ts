@@ -7,6 +7,8 @@ import {
   type LiquidityBulkResponse,
   type LatestPriceBidPoint,
   type LatestPricesResponse,
+  type SalesDailyFile,
+  type SalesDailyRow,
   type SchemaSnapshotResponse,
 } from "../../src";
 const client = new SkinpricerClient({ apiKey: "test-key" });
@@ -26,6 +28,7 @@ expectTypeOf<keyof SkinpricerClient>().toEqualTypeOf<
   | "markets"
   | "schema"
   | "prices"
+  | "sales"
   | "forGame"
 >();
 const rust = client.forGame("rust");
@@ -66,6 +69,15 @@ expectTypeOf<LatestPriceBidPoint["quoteSize"]>().toEqualTypeOf<number | null>();
 void client.prices.latestAll({});
 // @ts-expect-error The snapshot accepts only CS2 and Rust.
 void client.prices.latestAll({ game: "tf2" });
+expectTypeOf(
+  client.sales.daily({ game: "cs2", date: "2026-11-26" }),
+).toEqualTypeOf<Promise<SalesDailyFile>>();
+expectTypeOf(
+  client.sales.daily({ game: "rust", date: "2026-11-26", ifNoneMatch: '"1"' }),
+).toEqualTypeOf<Promise<SalesDailyFile | null>>();
+expectTypeOf<SalesDailyRow["count"]>().toEqualTypeOf<number | null>();
+// @ts-expect-error The daily file requires a date.
+void client.sales.daily({ game: "cs2" });
 // @ts-expect-error The snapshot is on the root client and takes the game as a parameter.
 void rust.prices;
 // @ts-expect-error Rust has no attribute price endpoint.
