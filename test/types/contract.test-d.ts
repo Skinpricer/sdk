@@ -109,9 +109,7 @@ expectTypeOf<MarketPricePoint["sourceTimeKind"]>().toEqualTypeOf<
 expectTypeOf<MarketPricePoint["sourceAgeSeconds"]>().toEqualTypeOf<
   number | null | undefined
 >();
-expectTypeOf<MarketPricePoint["isSourceStale"]>().toEqualTypeOf<
-  boolean | undefined
->();
+expectTypeOf<MarketPricePoint>().not.toHaveProperty("isSourceStale");
 expectTypeOf<MarketPricePoint["originalPriceCents"]>().toEqualTypeOf<
   number | null | undefined
 >();

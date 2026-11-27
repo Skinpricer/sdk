@@ -55,7 +55,6 @@ describe("market price points", () => {
         sourceUpdatedAt: "2026-09-28T11:31:09.000Z",
         sourceTimeKind: "last_modified",
         sourceAgeSeconds: 1591,
-        isSourceStale: false,
       },
       {
         market: "buff163",

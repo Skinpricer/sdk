@@ -9,6 +9,7 @@
 ### Breaking changes
 
 - The snake_case response fields are gone from the aggregations, market analytics, recommendations, freshness and latency status, and bulk liquidity map types, because the API no longer sends them. Read the camelCase names instead, for example `marketHashName` for `market_hash_name`.
+- `isSourceStale` is gone from `MarketPricePoint` and `LatestPriceBidPoint`, because the API never sent it. Use `sourceAgeSeconds` to judge how old a source's data is.
 
 ## 0.5.0
 
