@@ -4,6 +4,10 @@
 
 ### Minor Changes
 
+- Add camelCase names beside the snake_case response fields on aggregations, market analytics, recommendations, status and the bulk liquidity map. The snake_case fields are `@deprecated` and leave the API on 2027-01-15.
+- `nbbo.get()` and `nbbo.depth()` send `marketHashName` instead of the deprecated `market_hash_name` query parameter.
+- `ValidationError.messages` lists the rejected fields from the error body's `details`, and errors fall back to the body's `requestId`.
+- Add `priceKind`, `purchasable`, `valueKind`, `sellBasis`, `suggestedPriceKind`, `feeStatus` and `feeModelVersion`. `ExecutionAdjustedBestPrice.appliedFeeBps` and `withdrawalFlatUsdCents` can be `null`.
 - Add `bestMarketToListPayout` and the `LiquidityPayout` type to the liquidity response, summary and bulk item types. It says whether `bestMarketToList` pays `cash`, `wallet` (Steam Wallet funds, which cannot be withdrawn), `bot_rate` or `unknown`, and is null exactly when `bestMarketToList` is null.
 
 ### Patch Changes

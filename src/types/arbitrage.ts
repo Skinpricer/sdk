@@ -1,5 +1,5 @@
 import type { KnownMarket } from "./markets";
-import type { Cents, IsoDateString } from "./shared";
+import type { Cents, IsoDateString, QuotePriceKind } from "./shared";
 
 /** Sorting by spreadBps ranks opportunities by netSpreadBps after seller commission. */
 export type ArbitrageSort = "estimatedNetCents" | "spreadBps";
@@ -31,6 +31,9 @@ export interface ArbitrageQuote {
   priceLevelQuantity: number | null;
   updatedAt: IsoDateString;
   isStale: boolean;
+  priceKind?: QuotePriceKind;
+  /** True only for an ask you can buy at now. Always false on a bid. */
+  purchasable?: boolean;
 }
 
 export interface ArbitrageFreshness {

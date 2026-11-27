@@ -4,6 +4,7 @@ import type {
   IsoDateString,
   NbboBestPrice,
   SourceTimeKind,
+  ValueKind,
 } from "./shared";
 
 export interface LatestPricesParams {
@@ -31,6 +32,8 @@ export interface LatestPriceAskPoint extends LatestPricePoint {
   quoteSize: number;
   /** True for a placeholder ask far above the corroborated cheaper asks. It is still a real listing. */
   outlier?: boolean;
+  /** Present, and false, only when the ask cannot be bought now. */
+  purchasable?: false;
 }
 
 export interface LatestPriceBidPoint extends LatestPricePoint {
@@ -46,6 +49,7 @@ export interface LatestPriceBidPoint extends LatestPricePoint {
   sourceAgeSeconds?: number;
   /** Whether the source's data was older than 30 minutes when the snapshot was built. */
   isSourceStale?: boolean;
+  valueKind?: ValueKind;
 }
 
 export interface LatestPriceItem {

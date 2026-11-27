@@ -23,6 +23,8 @@ export interface AllItemsLatestPrice {
   effectiveUsdCents: Cents;
   fetchedAt: IsoDateString;
   originalCurrency: string;
+  /** Present, and false, only when the ask cannot be bought now. */
+  purchasable?: false;
 }
 
 export interface AllItemsPriceAggregates {

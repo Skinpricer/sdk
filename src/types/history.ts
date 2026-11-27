@@ -1,5 +1,11 @@
 import type { KnownMarket } from "./markets";
-import type { Cents, IsoDateString } from "./shared";
+import type { Cents, IsoDateString, SellBasis, ValueKind } from "./shared";
+
+/** History values are statistics over asks, bids or sales, never a single quote. */
+export type HistoryPriceKind =
+  | "ask_statistic"
+  | "bid_statistic"
+  | "sale_statistic";
 
 export type HistoryListingType = "SELL_OFFER" | "BUY_ORDER" | "SALE_HISTORY";
 /** Accepted on input; the backend also normalizes `SELL`/`BUY`/`SALES`. */
@@ -48,6 +54,7 @@ export interface PriceHistoryResponse {
   name: string;
   history: PriceHistoryPoint[];
   listingType: HistoryListingType;
+  priceKind?: HistoryPriceKind;
   salesWindow: SalesHistoryWindow | null;
   /** Actual returned bucket width, which may differ from the requested interval. */
   effectiveInterval: "10m" | "1h" | "1d";
@@ -56,6 +63,10 @@ export interface PriceHistoryResponse {
 export interface MarketSeries {
   market: string;
   history: PriceHistoryPoint[];
+  /** `SELL_OFFER` series only. */
+  sellBasis?: SellBasis;
+  /** `BUY_ORDER` series only. */
+  valueKind?: ValueKind;
 }
 
 /** `GET /v1/pricing/:marketHashName/history/markets` (camelCase). */
@@ -64,6 +75,7 @@ export interface PriceHistoryByMarketResponse {
   name: string;
   series: MarketSeries[];
   listingType: HistoryListingType;
+  priceKind?: HistoryPriceKind;
   salesWindow: SalesHistoryWindow | null;
   /** Actual returned bucket width, which may differ from the requested interval. */
   effectiveInterval: "10m" | "1h" | "1d";

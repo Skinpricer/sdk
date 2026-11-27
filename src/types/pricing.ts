@@ -45,6 +45,9 @@ export interface PricingListing {
   stickers: unknown[];
   isStatTrak: boolean;
   fetchedAt: IsoDateString;
+  /** `listing` for a single listing, `ask` for a market's lowest-ask row. */
+  priceKind?: "ask" | "listing";
+  purchasable?: boolean;
 }
 
 export interface PricingListingFloatCoverage {

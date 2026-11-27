@@ -4,7 +4,7 @@ import { SkinpricerError, type SkinpricerErrorOptions } from "./base";
 export class APIError extends SkinpricerError {}
 
 export interface ValidationErrorOptions extends SkinpricerErrorOptions {
-  /** Individual validation messages (NestJS returns `message` as an array on 400). */
+  /** One entry per rejected field or parameter, from the error body's `details` (or a NestJS `message` array). */
   messages?: string[];
 }
 

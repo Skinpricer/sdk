@@ -16,7 +16,7 @@ describe("aggregations auto-batching", () => {
   it("minPricesAll chunks >100 ids into batches and merges results", async () => {
     const { client, mock } = makeClient({
       json: {
-        items: [{ canonical_item_id: "x", market_hash_name: "n", prices: [] }],
+        items: [{ canonicalItemId: "x", marketHashName: "n", prices: [] }],
       },
     });
     const ids = Array.from({ length: 250 }, (_, i) => `id${i}`);
@@ -43,7 +43,7 @@ describe("aggregations auto-batching", () => {
   it("maxOrdersAll batches as well", async () => {
     const { client, mock } = makeClient({
       json: {
-        items: [{ canonical_item_id: "x", market_hash_name: "n", orders: [] }],
+        items: [{ canonicalItemId: "x", marketHashName: "n", orders: [] }],
       },
     });
     const res = await client.aggregations.maxOrdersAll(

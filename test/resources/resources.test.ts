@@ -70,21 +70,23 @@ describe("resource routing — all 24 endpoints", () => {
     expect(url.searchParams.get("from")).toBe("2026-04-20T00:00:00.000Z");
   });
 
-  it("nbbo.get maps marketHashName to market_hash_name", async () => {
+  it("nbbo.get sends marketHashName", async () => {
     const { client, mock } = setup();
     await client.nbbo.get({ marketHashName: MHN, markets: ["csfloat"] });
     const url = lastUrl(mock);
     expect(url.pathname).toBe("/v1/nbbo");
-    expect(url.searchParams.get("market_hash_name")).toBe(MHN);
+    expect(url.searchParams.get("marketHashName")).toBe(MHN);
+    expect(url.searchParams.has("market_hash_name")).toBe(false);
     expect(url.searchParams.get("markets")).toBe("csfloat");
   });
 
   it("nbbo.depth", async () => {
     const { client, mock } = setup();
-    await client.nbbo.depth({ id: "clx123", depth: 25 });
+    await client.nbbo.depth({ marketHashName: MHN, depth: 25 });
     const url = lastUrl(mock);
     expect(url.pathname).toBe("/v1/nbbo/depth");
-    expect(url.searchParams.get("id")).toBe("clx123");
+    expect(url.searchParams.get("marketHashName")).toBe(MHN);
+    expect(url.searchParams.has("market_hash_name")).toBe(false);
     expect(url.searchParams.get("depth")).toBe("25");
   });
 

@@ -21,6 +21,7 @@ interface ExtractedError {
   code?: string;
   message: string;
   messages?: string[];
+  requestId?: string;
 }
 
 function defaultMessage(status: number): string {
@@ -43,6 +44,16 @@ function extractErrorFields(body: unknown, status: number): ExtractedError {
         typeof err.message === "string" ? err.message : defaultMessage(status);
       const result: ExtractedError = { message };
       if (typeof err.code === "string") result.code = err.code;
+      if (Array.isArray(err.details)) {
+        const messages = err.details.filter(
+          (entry): entry is string => typeof entry === "string",
+        );
+        if (messages.length > 0) {
+          result.message = `${message}: ${messages.join(", ")}`;
+          result.messages = messages;
+        }
+      }
+      if (typeof body.requestId === "string") result.requestId = body.requestId;
       return result;
     }
 
@@ -78,12 +89,15 @@ function looksLikeFeatureError(message: string): boolean {
 
 export function errorFromResponse(input: ErrorResponseInput): SkinpricerError {
   const { status, body, meta } = input;
-  const { code, message, messages } = extractErrorFields(body, status);
+  const { code, message, messages, requestId } = extractErrorFields(
+    body,
+    status,
+  );
 
   const base: SkinpricerErrorBase = {
     status,
     code,
-    requestId: meta.requestId,
+    requestId: meta.requestId ?? requestId ?? null,
     responseBody: body,
     rateLimit: meta.rateLimit,
   };

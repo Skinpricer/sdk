@@ -9,7 +9,13 @@ import type {
   LiquidityResponse,
   LiquiditySummaryResponse,
   CurrentPriceResponse,
+  ExecutionAdjustedBestPrice,
+  FreshnessResponse,
+  ItemMinPrices,
+  MarketAnalyticsPoint,
   MarketAnalyticsResponse,
+  MarketLatency,
+  MarketMaxOrder,
   MarketFreshness,
   MarketMinPrice,
   MarketPricePoint,
@@ -27,6 +33,41 @@ expectTypeOf<MarketMinPrice>().toHaveProperty("market_name");
 expectTypeOf<MarketFreshness>().toHaveProperty("delay_seconds");
 expectTypeOf<RecommendationResponse>().toHaveProperty("canonical_item_id");
 expectTypeOf<MarketAnalyticsResponse>().toHaveProperty("calculated_at");
+
+expectTypeOf<BestPrice["updatedAt"]>().toEqualTypeOf<string>();
+expectTypeOf<BestPrice["isStale"]>().toEqualTypeOf<boolean>();
+expectTypeOf<MarketMinPrice["marketName"]>().toEqualTypeOf<string>();
+expectTypeOf<MarketMaxOrder["totalQuantity"]>().toEqualTypeOf<
+  number | undefined
+>();
+expectTypeOf<ItemMinPrices["marketHashName"]>().toEqualTypeOf<string>();
+expectTypeOf<MarketAnalyticsPoint["currentAsk"]>().toEqualTypeOf<
+  number | null
+>();
+expectTypeOf<MarketAnalyticsResponse["windowHours"]>().toEqualTypeOf<number>();
+expectTypeOf<
+  RecommendationResponse["bestAsk"]
+>().toEqualTypeOf<BestPrice | null>();
+expectTypeOf<MarketFreshness["delaySeconds"]>().toEqualTypeOf<number>();
+expectTypeOf<FreshnessResponse["overallStatus"]>().toEqualTypeOf<
+  "healthy" | "degraded" | "stale"
+>();
+expectTypeOf<MarketLatency["p95LatencyMs"]>().toEqualTypeOf<number>();
+expectTypeOf<LiquidityBulkItem["marketHashName"]>().toEqualTypeOf<string>();
+expectTypeOf<LiquidityBulkItem["estimatedSaleTime"]>().toEqualTypeOf<string>();
+
+expectTypeOf<ExecutionAdjustedBestPrice["appliedFeeBps"]>().toEqualTypeOf<
+  number | null
+>();
+expectTypeOf<ExecutionAdjustedBestPrice["feeStatus"]>().toEqualTypeOf<
+  "complete" | "partial" | "unknown" | undefined
+>();
+expectTypeOf<MarketPricePoint["valueKind"]>().toEqualTypeOf<
+  "cash" | "wallet" | "bot_rate" | "unknown" | undefined
+>();
+expectTypeOf<MarketAnalyticsPoint["sellBasis"]>().toEqualTypeOf<
+  "listing_statistic" | "lowest_ask" | undefined
+>();
 
 expectTypeOf<CurrentPriceResponse["calculatedAt"]>().toEqualTypeOf<string>();
 expectTypeOf<PriceHistoryPoint["avgPrice"]>().toEqualTypeOf<number | null>();
