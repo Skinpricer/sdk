@@ -1,18 +1,25 @@
 # @skinpricer/sdk
 
-## Unreleased
+## 0.5.0
+
+### Breaking changes
+
+- `ExecutionAdjustedBestPrice.appliedFeeBps` and `withdrawalFlatUsdCents` can be `null`.
+- Typed fixtures for aggregations, market analytics, recommendations, freshness and latency status, and the bulk liquidity map need the new camelCase fields.
+- Earlier SDK versions stop working for NBBO lookups by name on 2027-01-15, when the API rejects `market_hash_name`. Upgrade before then.
 
 ### Minor Changes
 
-- Add camelCase names beside the snake_case response fields on aggregations, market analytics, recommendations, status and the bulk liquidity map. The snake_case fields are `@deprecated` and leave the API on 2027-01-15.
-- `nbbo.get()` and `nbbo.depth()` send `marketHashName` instead of the deprecated `market_hash_name` query parameter.
-- `ValidationError.messages` lists the rejected fields from the error body's `details`, and errors fall back to the body's `requestId`.
-- Add `priceKind`, `purchasable`, `valueKind`, `sellBasis`, `suggestedPriceKind`, `feeStatus` and `feeModelVersion`. `ExecutionAdjustedBestPrice.appliedFeeBps` and `withdrawalFlatUsdCents` can be `null`.
-- Add `bestMarketToListPayout` and the `LiquidityPayout` type to the liquidity response, summary and bulk item types. It says whether `bestMarketToList` pays `cash`, `wallet` (Steam Wallet funds, which cannot be withdrawn), `bot_rate` or `unknown`, and is null exactly when `bestMarketToList` is null.
+- 8364e62: - Add the camelCase name beside every snake_case response field on aggregations, market analytics, recommendations, freshness and latency status, and the bulk liquidity map, for example `marketHashName` beside `market_hash_name` and `updatedAt` beside `updated_at`. The snake_case fields are marked `@deprecated`. The API stops sending them on 2027-01-15, so switch reads to the camelCase names before then. Typed fixtures for these responses need the camelCase fields.
+  - `nbbo.get()` and `nbbo.depth()` send `marketHashName` instead of the deprecated `market_hash_name` query parameter, which the API rejects with a 400 error from 2027-01-15. Earlier SDK versions stop working for NBBO lookups by name on that date.
+  - `ValidationError.messages` lists the rejected fields and parameters from the error body's `details`, and the error message includes them. Errors take `requestId` from the response body when the `X-Request-Id` header is missing.
+  - Add the price-meaning fields: `priceKind` and `purchasable` on quotes and best prices, `valueKind` on bids, `sellBasis` on market analytics and sell-offer history series, `priceKind` on history responses and aggregates, `suggestedPriceKind` on recommendations, and `feeStatus` and `feeModelVersion` on execution-adjusted NBBO quotes. New exported types: `QuotePriceKind`, `ValueKind`, `SellBasis`, `FeeStatus` and `HistoryPriceKind`.
+  - `ExecutionAdjustedBestPrice.appliedFeeBps` and `withdrawalFlatUsdCents` can be `null` when the fees are unknown. Handle null before calculating with them.
+- 038b323: Add `bestMarketToListPayout` to `LiquidityResponse`, `LiquiditySummaryResponse` and `LiquidityBulkItem`, plus the `LiquidityPayout` type. It says what `bestMarketToList` pays the seller: `cash`, `wallet`, `bot_rate` or `unknown`, and is null exactly when `bestMarketToList` is null. `wallet` means Steam Community Market, which pays Steam Wallet funds that cannot be withdrawn. Check it before treating the best market as a cash exit.
 
 ### Patch Changes
 
-- Document the `candidateLimit` range of `arbitrage.opportunities()` as 50–1000. The API rejects values above 1000 with a 400 error.
+- 9253aff: Document the `candidateLimit` range of `arbitrage.opportunities()` as 50–1000. The API rejects values above 1000 with a 400 error.
 
 ## 0.4.0
 
