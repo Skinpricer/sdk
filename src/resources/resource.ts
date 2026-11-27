@@ -1,5 +1,6 @@
 import { ConfigurationError } from "../errors/network-errors";
 import type { HttpClient, RequestOptions } from "../http/http-client";
+import type { BodyReader } from "../http/parse-response";
 import type { BuildRequestInput } from "../http/request-builder";
 import type { Game } from "../types/games";
 import { attachMeta } from "../meta";
@@ -32,6 +33,7 @@ export abstract class BaseResource {
   protected async call<T>(
     input: BuildRequestInput,
     options?: RequestOptions,
+    readBody?: BodyReader<T>,
   ): Promise<T> {
     assertPathSegments(input.path);
     const scoped =
@@ -42,7 +44,11 @@ export abstract class BaseResource {
             baseUrl: this.http.versionedBaseUrl("v2", input.baseUrl),
             query: { ...input.query, game: this.game },
           };
-    const { data, meta } = await this.http.request<T>(scoped, options);
+    const { data, meta } = await this.http.request<T>(
+      scoped,
+      options,
+      readBody,
+    );
     return attachMeta(data, meta);
   }
 }

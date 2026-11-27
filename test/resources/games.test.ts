@@ -106,6 +106,7 @@ describe("game scope", () => {
       "PricesResource",
       "PricingResource",
       "RecommendationsResource",
+      "SalesResource",
       "SchemaResource",
       "StatusResource",
     ]);
