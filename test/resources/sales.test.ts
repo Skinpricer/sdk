@@ -131,6 +131,26 @@ describe("sales.daily", () => {
     ).rejects.toBeInstanceOf(ParseError);
   });
 
+  it("rejects when the caller aborts after the response arrives", async () => {
+    const controller = new AbortController();
+    const client = new SkinpricerClient({
+      apiKey: "test-key",
+      retry: false,
+      fetch: async () => {
+        queueMicrotask(() => controller.abort());
+        return new Response(new Uint8Array(gzipSync(ndjson([saleRow]))), {
+          headers: fileHeaders,
+        });
+      },
+    });
+    await expect(
+      client.sales.daily(
+        { game: "cs2", date: "2026-11-26" },
+        { signal: controller.signal },
+      ),
+    ).rejects.toMatchObject({ name: "AbortError" });
+  });
+
   it("maps a missing day to NotFoundError", async () => {
     const { client } = setup({
       status: 404,

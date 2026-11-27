@@ -201,7 +201,8 @@ if (!day.final && day.etag) {
 ```
 
 A day is first built provisional at about 06:10 UTC the next day (`final: false`)
-and rebuilt once as final about 12 hours later with the sales that arrived late.
+and rebuilt once as final at about 18:10 UTC the day after, with the sales that
+arrived late.
 `receivedThrough` is the archive receipt time the file covers. Sales rows
 (`evidence: "sales"`) count observed sales; points rows (`evidence: "points"`) carry
 a market's own statistics. Rows from different markets are never added together,

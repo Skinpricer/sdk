@@ -29,18 +29,20 @@ function tryJsonParse(text: string): unknown {
 export type BodyReader<T> = (
   response: Response,
   meta: ResponseMeta,
+  signal: AbortSignal,
 ) => Promise<T>;
 
 export async function parseResponse<T>(
   response: Response,
   allowNotModified = false,
   readBody?: BodyReader<T>,
+  signal: AbortSignal = new AbortController().signal,
 ): Promise<HttpResponse<T>> {
   const meta = buildMeta(response);
   if (allowNotModified && response.status === 304)
     return { data: null as T, meta };
   if (readBody !== undefined && response.ok)
-    return { data: await readBody(response, meta), meta };
+    return { data: await readBody(response, meta, signal), meta };
   const text = await response.text();
 
   if (response.ok) {

@@ -93,6 +93,7 @@ export class HttpClient {
           response,
           input.ifNoneMatch !== undefined,
           readBody,
+          handle.signal,
         );
         handle.cleanup();
         this.recordRateLimit(parsed.meta.rateLimit);

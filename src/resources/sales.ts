@@ -9,22 +9,26 @@ import type {
 } from "../types/sales";
 import { BaseResource } from "./resource";
 
-async function ndjsonText(response: Response): Promise<string> {
+async function ndjsonText(
+  response: Response,
+  signal: AbortSignal,
+): Promise<string> {
   const bytes = new Uint8Array(await response.arrayBuffer());
   // A fetch that honours Content-Encoding has already decompressed the body.
   if (bytes[0] !== 0x1f || bytes[1] !== 0x8b)
     return new TextDecoder().decode(bytes);
   const stream = new Blob([bytes])
     .stream()
-    .pipeThrough(new DecompressionStream("gzip"));
+    .pipeThrough(new DecompressionStream("gzip"), { signal });
   return new Response(stream).text();
 }
 
 async function readSalesDailyFile(
   response: Response,
   meta: ResponseMeta,
+  signal: AbortSignal,
 ): Promise<SalesDailyFile> {
-  const text = await ndjsonText(response);
+  const text = await ndjsonText(response, signal);
   const rows: SalesDailyRow[] = [];
   for (const line of text.split("\n")) {
     if (line.length === 0) continue;
@@ -40,6 +44,7 @@ async function readSalesDailyFile(
       });
     }
   }
+  signal.throwIfAborted();
   return {
     etag: meta.headers.get("etag"),
     final: meta.headers.get("x-sales-final") === "true",
