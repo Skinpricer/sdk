@@ -27,12 +27,18 @@ import type {
 expectTypeOf<NbboBestPrice>().toHaveProperty("updatedAt");
 expectTypeOf<NbboBestPrice>().toHaveProperty("isStale");
 
-expectTypeOf<BestPrice>().toHaveProperty("updated_at");
-expectTypeOf<BestPrice>().toHaveProperty("is_stale");
-expectTypeOf<MarketMinPrice>().toHaveProperty("market_name");
-expectTypeOf<MarketFreshness>().toHaveProperty("delay_seconds");
-expectTypeOf<RecommendationResponse>().toHaveProperty("canonical_item_id");
-expectTypeOf<MarketAnalyticsResponse>().toHaveProperty("calculated_at");
+expectTypeOf<BestPrice>().not.toHaveProperty("updated_at");
+expectTypeOf<BestPrice>().not.toHaveProperty("is_stale");
+expectTypeOf<MarketMinPrice>().not.toHaveProperty("market_name");
+expectTypeOf<ItemMinPrices>().not.toHaveProperty("market_hash_name");
+expectTypeOf<MarketMaxOrder>().not.toHaveProperty("total_quantity");
+expectTypeOf<MarketFreshness>().not.toHaveProperty("delay_seconds");
+expectTypeOf<FreshnessResponse>().not.toHaveProperty("checked_at");
+expectTypeOf<MarketLatency>().not.toHaveProperty("p95_latency_ms");
+expectTypeOf<RecommendationResponse>().not.toHaveProperty("canonical_item_id");
+expectTypeOf<MarketAnalyticsResponse>().not.toHaveProperty("calculated_at");
+expectTypeOf<MarketAnalyticsPoint>().not.toHaveProperty("current_ask");
+expectTypeOf<LiquidityBulkItem>().not.toHaveProperty("market_hash_name");
 
 expectTypeOf<BestPrice["updatedAt"]>().toEqualTypeOf<string>();
 expectTypeOf<BestPrice["isStale"]>().toEqualTypeOf<boolean>();

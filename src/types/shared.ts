@@ -82,10 +82,6 @@ export interface BestPrice {
   price: Cents;
   updatedAt: IsoDateString;
   isStale: boolean;
-  /** @deprecated Use `updatedAt`. The API stops sending it on 2027-01-15. */
-  updated_at: IsoDateString;
-  /** @deprecated Use `isStale`. The API stops sending it on 2027-01-15. */
-  is_stale: boolean;
   priceKind?: QuotePriceKind;
   /** True only for an ask you can buy at now. Always false on a bid. */
   purchasable?: boolean;
