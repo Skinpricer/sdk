@@ -41,8 +41,6 @@ export interface MarketPricePoint {
   sourceTimeKind?: SourceTimeKind;
   /** Age of the source's data when it was read, in seconds. */
   sourceAgeSeconds?: number | null;
-  /** Whether the source's data is older than 30 minutes. Absent when its age is unknown. */
-  isSourceStale?: boolean;
   /** True for a placeholder ask left out of the aggregate's average, median and deviation. It is still a real listing. */
   outlier?: boolean;
   priceKind?: QuotePriceKind;

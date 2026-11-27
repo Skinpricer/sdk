@@ -47,8 +47,6 @@ export interface LatestPriceBidPoint extends LatestPricePoint {
   sourceTimeKind?: SourceTimeKind;
   /** Age of the source's data when it was read, in seconds. */
   sourceAgeSeconds?: number;
-  /** Whether the source's data was older than 30 minutes when the snapshot was built. */
-  isSourceStale?: boolean;
   valueKind?: ValueKind;
 }
 

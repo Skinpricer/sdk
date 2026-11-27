@@ -65,6 +65,7 @@ expectTypeOf(
   client.prices.latestAll({ game: "cs2", ifNoneMatch: 'W/"1"' }),
 ).toEqualTypeOf<Promise<LatestPricesResponse | null>>();
 expectTypeOf<LatestPriceBidPoint["quoteSize"]>().toEqualTypeOf<number | null>();
+expectTypeOf<LatestPriceBidPoint>().not.toHaveProperty("isSourceStale");
 // @ts-expect-error The snapshot requires a game.
 void client.prices.latestAll({});
 // @ts-expect-error The snapshot accepts only CS2 and Rust.

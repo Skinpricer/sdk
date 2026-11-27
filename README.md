@@ -85,9 +85,9 @@ A price point's `fetchedAt` is when the price was last read or confirmed still
 current, so it can be recent while the source's data is older. Where a source
 states when it produced its data, price points add `sourceUpdatedAt`,
 `sourceTimeKind` (`payload`, `last_modified`, `cdn_age` or `none`),
-`sourceAgeSeconds` (the data's age when it was read) and `isSourceStale` (older
-than 30 minutes). Most sources state no such time, so these fields are usually
-absent. Treat an absent value as unknown, not as fresh.
+and `sourceAgeSeconds` (the data's age when it was read). Use `sourceAgeSeconds`
+to judge how old the source's data is. Most sources state no such time, so these
+fields are usually absent. Treat an absent value as unknown, not as fresh.
 
 CS2 arbitrage `spreadBps` and `spreadCents` describe gross price differences.
 `netSpreadBps` and `estimatedNetCents` account for estimated seller commission;
