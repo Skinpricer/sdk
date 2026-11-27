@@ -140,12 +140,8 @@ export interface LiquidityBatchResponse {
 /** Bulk-map entry. */
 export interface LiquidityBulkItem {
   marketHashName: string;
-  /** @deprecated Use `marketHashName`. The API stops sending it on 2027-01-15. */
-  market_hash_name: string;
   liquidity: LiquidityLabel;
   estimatedSaleTime: string;
-  /** @deprecated Use `estimatedSaleTime`. The API stops sending it on 2027-01-15. */
-  estimated_sale_time: string;
   liquidityBadge: LiquidityBadge;
   confidence: LiquidityConfidence;
   score: number | null;

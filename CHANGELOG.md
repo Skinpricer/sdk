@@ -1,5 +1,11 @@
 # @skinpricer/sdk
 
+## Unreleased
+
+### Breaking changes
+
+- The snake_case response fields are gone from the aggregations, market analytics, recommendations, freshness and latency status, and bulk liquidity map types, because the API no longer sends them. Read the camelCase names instead, for example `marketHashName` for `market_hash_name`.
+
 ## 0.5.0
 
 ### Breaking changes

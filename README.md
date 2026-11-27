@@ -210,11 +210,9 @@ const client = new SkinpricerClient({
 | `client.schema`          | `snapshot`, `get`, `changes`, `changesEach`   |
 | `client.prices`          | `latestAll`                                   |
 
-Aggregations, market analytics, recommendations, freshness/latency status and the
-bulk liquidity map return each field in camelCase (`marketHashName`, `updatedAt`)
-beside a snake_case alias (`market_hash_name`, `updated_at`). The aliases are
-marked `@deprecated`; the API stops sending them on 2027-01-15, so read the
-camelCase names.
+Response fields are camelCase (`marketHashName`, `updatedAt`). The API no longer
+sends the snake_case aliases (`market_hash_name`, `updated_at`) that SDK 0.5.0
+still typed.
 
 Every method accepts an optional trailing `RequestOptions` (`{ signal, timeoutMs, retry }`).
 
