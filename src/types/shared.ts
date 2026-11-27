@@ -7,6 +7,15 @@ export type Cents = number;
 /** Evidence for a source time: the payload's own timestamp, a `Last-Modified` header, or CDN cache age. */
 export type SourceTimeKind = "payload" | "last_modified" | "cdn_age" | "none";
 
+/** `ask` is a market's lowest sell price, `bid` its highest buy order. */
+export type QuotePriceKind = "ask" | "bid";
+
+/** What a seller receives when a bid fills: withdrawable cash, Steam Wallet funds, or credit at the venue's own rate. */
+export type ValueKind = "cash" | "wallet" | "bot_rate" | "unknown";
+
+/** Whether a sell average and maximum come from the market's own listing statistics or from observed lowest asks. */
+export type SellBasis = "listing_statistic" | "lowest_ask";
+
 export interface MarketPricePoint {
   market: string;
   price: Cents;
@@ -36,6 +45,11 @@ export interface MarketPricePoint {
   isSourceStale?: boolean;
   /** True for a placeholder ask left out of the aggregate's average, median and deviation. It is still a real listing. */
   outlier?: boolean;
+  priceKind?: QuotePriceKind;
+  /** True only for an ask you can buy at now. Always false on a bid. */
+  purchasable?: boolean;
+  /** Bids only. */
+  valueKind?: ValueKind;
 }
 
 export interface AggregatePriceData {
@@ -50,6 +64,7 @@ export interface AggregatePriceData {
   freshMarketCount?: number;
   listingCount?: number;
   updatedAt: IsoDateString;
+  priceKind?: "ask_statistic";
 }
 
 export interface NbboBestPrice {
@@ -57,13 +72,23 @@ export interface NbboBestPrice {
   price: Cents;
   updatedAt: IsoDateString;
   isStale: boolean;
+  priceKind?: QuotePriceKind;
+  /** True only for an ask you can buy at now. Always false on a bid. */
+  purchasable?: boolean;
 }
 
 export interface BestPrice {
   market: string;
   price: Cents;
+  updatedAt: IsoDateString;
+  isStale: boolean;
+  /** @deprecated Use `updatedAt`. The API stops sending it on 2027-01-15. */
   updated_at: IsoDateString;
+  /** @deprecated Use `isStale`. The API stops sending it on 2027-01-15. */
   is_stale: boolean;
+  priceKind?: QuotePriceKind;
+  /** True only for an ask you can buy at now. Always false on a bid. */
+  purchasable?: boolean;
 }
 
 export interface PaginationMeta {

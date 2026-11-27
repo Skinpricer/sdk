@@ -17,7 +17,7 @@ export class NbboResource extends BaseResource {
         path: "/nbbo",
         query: {
           id: params.id,
-          market_hash_name: params.marketHashName,
+          marketHashName: params.marketHashName,
           markets: params.markets,
         },
       },
@@ -36,7 +36,7 @@ export class NbboResource extends BaseResource {
         path: "/nbbo/depth",
         query: {
           id: params.id,
-          market_hash_name: params.marketHashName,
+          marketHashName: params.marketHashName,
           markets: params.markets,
           depth: params.depth,
         },

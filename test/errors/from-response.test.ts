@@ -141,6 +141,53 @@ describe("errorFromResponse — custom envelope and odd bodies", () => {
     expect(err.message).toBe("No feature access");
   });
 
+  it("lists the envelope's validation details and its requestId", () => {
+    const err = errorFromResponse({
+      status: 400,
+      body: {
+        success: false,
+        error: {
+          code: "BAD_REQUEST",
+          message: "Validation failed",
+          details: ["bogus: property bogus should not exist"],
+          statusCode: 400,
+        },
+        timestamp: "2026-11-27T04:33:21.297Z",
+        path: "/v1/nbbo?bogus=1",
+        requestId: "b1bedd88-71e9-48fd-8078-2254a67ac1e0",
+      },
+      meta: meta(),
+    });
+    expect(err).toBeInstanceOf(ValidationError);
+    expect((err as ValidationError).messages).toEqual([
+      "bogus: property bogus should not exist",
+    ]);
+    expect(err.message).toBe(
+      "Validation failed: bogus: property bogus should not exist",
+    );
+    expect(err.code).toBe("BAD_REQUEST");
+    expect(err.requestId).toBe("b1bedd88-71e9-48fd-8078-2254a67ac1e0");
+  });
+
+  it("prefers the X-Request-Id header over the body's requestId", () => {
+    const err = errorFromResponse({
+      status: 400,
+      body: {
+        success: false,
+        error: {
+          code: "BAD_REQUEST",
+          message: "Validation failed",
+          details: null,
+        },
+        requestId: "from-body",
+      },
+      meta: meta({ "x-request-id": "from-header" }),
+    });
+    expect(err.requestId).toBe("from-header");
+    expect(err.message).toBe("Validation failed");
+    expect((err as ValidationError).messages).toEqual([]);
+  });
+
   it("handles a raw string body", () => {
     const err = errorFromResponse({
       status: 502,

@@ -1,10 +1,19 @@
 import type { KnownMarket } from "./markets";
-import type { Cents, IsoDateString, NbboBestPrice } from "./shared";
+import type {
+  Cents,
+  IsoDateString,
+  NbboBestPrice,
+  QuotePriceKind,
+  ValueKind,
+} from "./shared";
+
+/** How well the fees on one side of the trade are known. With `unknown`, an ask's `appliedFeeBps` is null and a bid assumes a default commission. */
+export type FeeStatus = "complete" | "partial" | "unknown";
 
 export interface NbboParams {
   /** Canonical item id. Provide this or `marketHashName`. */
   id?: string;
-  /** Market hash name. Sent as the `market_hash_name` query param. */
+  /** Market hash name. */
   marketHashName?: string;
   markets?: KnownMarket[];
 }
@@ -14,12 +23,19 @@ export interface ExecutionAdjustedBestPrice {
   market: string;
   price: Cents;
   rawPrice: Cents;
-  appliedFeeBps: number;
-  withdrawalFlatUsdCents?: Cents;
+  /** Null on an ask when `feeStatus` is `unknown`. */
+  appliedFeeBps: number | null;
+  /** Null rather than zero when the market is not in the fee model. */
+  withdrawalFlatUsdCents?: Cents | null;
+  feeStatus?: FeeStatus;
+  feeModelVersion?: string;
   executability: number;
   updatedAt: IsoDateString;
   isStale: boolean;
   reasons: string[];
+  priceKind?: QuotePriceKind;
+  /** True only for an ask you can buy at now. Always false on a bid. */
+  purchasable?: boolean;
 }
 
 /** Execution-adjusted NBBO block: fee-aware best bid/ask re-ranked by executability. */
@@ -65,6 +81,10 @@ export interface NbboDepthQuote {
   ordersCount: number;
   updatedAt: IsoDateString;
   isStale: boolean;
+  priceKind?: QuotePriceKind;
+  /** True only for an ask level you can buy at now. Always false on a bid. */
+  purchasable?: boolean;
+  valueKind?: ValueKind;
 }
 
 export interface NbboDepthLevel {

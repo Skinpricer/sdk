@@ -210,6 +210,12 @@ const client = new SkinpricerClient({
 | `client.schema`          | `snapshot`, `get`, `changes`, `changesEach`   |
 | `client.prices`          | `latestAll`                                   |
 
+Aggregations, market analytics, recommendations, freshness/latency status and the
+bulk liquidity map return each field in camelCase (`marketHashName`, `updatedAt`)
+beside a snake_case alias (`market_hash_name`, `updated_at`). The aliases are
+marked `@deprecated`; the API stops sending them on 2027-01-15, so read the
+camelCase names.
+
 Every method accepts an optional trailing `RequestOptions` (`{ signal, timeoutMs, retry }`).
 
 ## Error handling
@@ -239,6 +245,10 @@ try {
   }
 }
 ```
+
+A `ValidationError` (400) lists each rejected field or parameter in `messages`.
+Errors from an API response carry its `requestId`; include it when you report a
+problem.
 
 ## Rate-limit metadata
 

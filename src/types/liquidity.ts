@@ -137,10 +137,14 @@ export interface LiquidityBatchResponse {
   calculatedAt: IsoDateString;
 }
 
-/** Bulk-map entry. `market_hash_name` and `estimated_sale_time` are snake_case on the wire. */
+/** Bulk-map entry. */
 export interface LiquidityBulkItem {
+  marketHashName: string;
+  /** @deprecated Use `marketHashName`. The API stops sending it on 2027-01-15. */
   market_hash_name: string;
   liquidity: LiquidityLabel;
+  estimatedSaleTime: string;
+  /** @deprecated Use `estimatedSaleTime`. The API stops sending it on 2027-01-15. */
   estimated_sale_time: string;
   liquidityBadge: LiquidityBadge;
   confidence: LiquidityConfidence;
@@ -168,7 +172,7 @@ export interface LiquidityBulkManifest {
   itemCount: number;
 }
 
-/** `GET /v1/liquidity/items` — Enterprise: whole-catalog map keyed by market_hash_name. */
+/** `GET /v1/liquidity/items` — Enterprise: whole-catalog map keyed by market hash name. */
 export interface LiquidityBulkResponse extends LiquidityBulkManifest {
   items: Record<string, LiquidityBulkItem>;
 }
