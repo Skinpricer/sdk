@@ -7,7 +7,7 @@ import type {
   ValueKind,
 } from "./shared";
 
-/** How well the fees on one side of the trade are known. With `unknown`, an ask has no `appliedFeeBps` and a bid assumes a default commission. */
+/** How well the fees on one side of the trade are known. With `unknown`, an ask's `appliedFeeBps` is null and a bid assumes a default commission. */
 export type FeeStatus = "complete" | "partial" | "unknown";
 
 export interface NbboParams {
