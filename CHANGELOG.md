@@ -8,10 +8,13 @@
 - `history.get()` takes `basis`, and on game-scoped clients `history.get()` and `history.byMarket()` take `currency` with its rate in `fx`. `PriceHistoryResponse` adds `basis`, `statistic`, `volumeBasis`, `steamWallet`, `corrections` and `fx`, and `PriceHistoryByMarketResponse` adds `corrections` and `fx`. New exported types: `GamePriceHistoryParams`, `HistoryCorrection` and `SteamWalletHistory`.
 - Add `sales.daily()` for `GET /v2/sales/daily`: every item's observed sales for one closed UTC day, decompressed into typed `SalesDailyRow` objects, with the file's `etag`, `final` and `receivedThrough`. Pass `ifNoneMatch` to get `null` for an unchanged file.
 
+- `PriceHistoryPoint` adds the fields the API sends: `netBestBidCents` and `netSpreadBps`, `contributingMarkets` and `observations` on combined `SALE_HISTORY`, and `originalPriceCents` and `originalCurrency` on per-market `SELL_OFFER`. New exported type: `SaleHistoryObservation`.
+
 ### Breaking changes
 
 - The snake_case response fields are gone from the aggregations, market analytics, recommendations, freshness and latency status, and bulk liquidity map types, because the API no longer sends them. Read the camelCase names instead, for example `marketHashName` for `market_hash_name`.
 - `isSourceStale` is gone from `MarketPricePoint` and `LatestPriceBidPoint`, because the API never sent it. Use `sourceAgeSeconds` to judge how old a source's data is.
+- `priceKind` is required on `PriceHistoryResponse` and `PriceHistoryByMarketResponse`, and `MarketSeries` adds the required `fxBasis`: `native` when the market quotes USD, `historical` when each value was converted to USD at the rate when it was observed. The API always sends both, so only typed fixtures need them.
 
 ## 0.5.0
 
