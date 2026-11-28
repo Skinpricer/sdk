@@ -5,6 +5,7 @@
 ### Minor Changes
 
 - Add `history.batch()` on game-scoped clients for `POST /v2/pricing/history/batch`: the aggregate history of up to 100 items in one request, with `items` and `errors` keyed by the entry as sent and an optional `currency` whose rate is returned in `fx`. New exported types: `PriceHistoryBatchParams`, `PriceHistoryBatchResponse`, `PriceHistoryBatchError`, `HistoryFx`, `HistoryCurrency` and `SaleHistoryBasis`.
+- `history.get()` takes `basis`, and on game-scoped clients `history.get()` and `history.byMarket()` take `currency` with its rate in `fx`. `PriceHistoryResponse` adds `basis`, `statistic`, `volumeBasis`, `steamWallet`, `corrections` and `fx`, and `PriceHistoryByMarketResponse` adds `corrections` and `fx`. New exported types: `GamePriceHistoryParams`, `HistoryCorrection` and `SteamWalletHistory`.
 - Add `sales.daily()` for `GET /v2/sales/daily`: every item's observed sales for one closed UTC day, decompressed into typed `SalesDailyRow` objects, with the file's `etag`, `final` and `receivedThrough`. Pass `ifNoneMatch` to get `null` for an unchanged file.
 
 ### Breaking changes

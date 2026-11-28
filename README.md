@@ -130,6 +130,11 @@ returned data: `10m`, `1h`, or `1d`. It can differ from the requested interval.
 Sell-offer history describes observed asks. Its maximum can include extreme
 listings and is not a fair-value estimate. Sales-history volume describes the
 selected rolling window; summing adjacent points would count overlapping sales.
+Combined `SALE_HISTORY` covers cash venues only and says so in `basis`,
+`statistic` and `volumeBasis`. Steam Community Market wallet sales, gross of Steam
+fees, are in `steamWallet` instead. When a response leaves out stored history known
+to be wrong, `corrections` lists each market and range it left out. Game-scoped
+`history.get` and `history.byMarket` take `currency` and return the rate in `fx`.
 
 Liquidity may report `INSUFFICIENT_DATA`, with a null score and no numeric sale-time estimate.
 This means there is not enough evidence for an estimate, not that no trades occur.

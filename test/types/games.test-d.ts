@@ -1,6 +1,8 @@
 import { expectTypeOf } from "vitest";
 import {
   SkinpricerClient,
+  type HistoryCorrection,
+  type HistoryFx,
   type PriceHistoryBatchResponse,
   type PriceHistoryResponse,
   type LiquidityBadge,
@@ -47,6 +49,22 @@ expectTypeOf<
   PriceHistoryBatchResponse["items"][string]
 >().toEqualTypeOf<PriceHistoryResponse>();
 expectTypeOf(client.history).not.toHaveProperty("batch");
+expectTypeOf<
+  NonNullable<PriceHistoryResponse["steamWallet"]>["history"]
+>().toEqualTypeOf<PriceHistoryResponse["history"]>();
+expectTypeOf<
+  NonNullable<PriceHistoryResponse["corrections"]>[number]
+>().toEqualTypeOf<HistoryCorrection>();
+expectTypeOf<PriceHistoryResponse["fx"]>().toEqualTypeOf<
+  HistoryFx | undefined
+>();
+void rust.history.get("Tempered AK47", { currency: "EUR" });
+// @ts-expect-error The v1 history routes do not convert currencies.
+void client.history.get("AK-47 | Redline (Field-Tested)", { currency: "EUR" });
+void rust.history.byMarket("Tempered AK47", {
+  // @ts-expect-error Per-market history rejects basis.
+  basis: "cash_venue_windows_v1",
+});
 // @ts-expect-error A batch needs items.
 void rust.history.batch({});
 expectTypeOf<"INSUFFICIENT_DATA">().toMatchTypeOf<LiquidityBadge>();

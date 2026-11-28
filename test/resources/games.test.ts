@@ -85,6 +85,38 @@ describe.each(["cs2", "rust"] as const)("%s customer resources", (game) => {
   });
 });
 
+describe("single history read", () => {
+  it("sends basis and currency on a game-scoped read", async () => {
+    const { client, mock } = setup();
+    const history = client.forGame("cs2").history;
+    await history.get(selectors.cs2, {
+      listingType: "SALE_HISTORY",
+      basis: "cash_venue_windows_v1",
+      currency: "EUR",
+    });
+    await history.byMarket(selectors.cs2, { currency: "JPY" });
+    const [single, byMarket] = mock.calls.map(
+      (call) => new URL(call.url).searchParams,
+    );
+    expect(single?.get("basis")).toBe("cash_venue_windows_v1");
+    expect(single?.get("currency")).toBe("EUR");
+    expect(byMarket?.get("currency")).toBe("JPY");
+    expect(byMarket?.has("basis")).toBe(false);
+  });
+
+  it("sends basis on the default client", async () => {
+    const { client, mock } = setup();
+    await client.history.get(selectors.cs2, {
+      listingType: "SALE_HISTORY",
+      basis: "cash_venue_windows_v1",
+    });
+    const url = new URL(mock.calls[0]!.url);
+    expect(url.pathname).toContain("/v1/pricing/");
+    expect(url.searchParams.get("basis")).toBe("cash_venue_windows_v1");
+    expect(url.searchParams.has("currency")).toBe(false);
+  });
+});
+
 describe("history batch", () => {
   it("posts the items and history options with the game", async () => {
     const response = {
