@@ -1,6 +1,6 @@
 import { ConfigurationError } from "./errors/network-errors";
 import type { HttpClient } from "./http/http-client";
-import { HistoryResource } from "./resources/history";
+import { GameHistoryResource } from "./resources/history";
 import { ItemSearchResource } from "./resources/items";
 import { ItemLiquidityResource } from "./resources/liquidity";
 import { MarketsResource } from "./resources/markets";
@@ -13,7 +13,7 @@ import type { LiquidityMarketForGame } from "./types/liquidity";
 /** Game-scoped v2 resources. Construct with `client.forGame(game)`. */
 export class GameClient<G extends Game> {
   readonly pricing: PricingResource;
-  readonly history: HistoryResource;
+  readonly history: GameHistoryResource;
   readonly items: ItemSearchResource;
   readonly nbbo: NbboResource;
   readonly liquidity: ItemLiquidityResource<LiquidityMarketForGame<G>>;
@@ -28,7 +28,7 @@ export class GameClient<G extends Game> {
       throw new ConfigurationError('The game must be "cs2" or "rust".');
     }
     this.pricing = new PricingResource(http, game);
-    this.history = new HistoryResource(http, game);
+    this.history = new GameHistoryResource(http, game);
     this.items = new ItemSearchResource(http, game);
     this.nbbo = new NbboResource(http, game);
     this.liquidity = new ItemLiquidityResource(http, game);

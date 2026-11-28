@@ -1,6 +1,7 @@
 import { expectTypeOf } from "vitest";
 import {
   SkinpricerClient,
+  type PriceHistoryBatchResponse,
   type PriceHistoryResponse,
   type LiquidityBadge,
   type LiquidityBulkManifest,
@@ -39,6 +40,15 @@ expectTypeOf(rust.liquidity.get)
 expectTypeOf<PriceHistoryResponse["effectiveInterval"]>().toEqualTypeOf<
   "10m" | "1h" | "1d"
 >();
+expectTypeOf(rust.history.batch({ items: ["Tempered AK47"] })).toEqualTypeOf<
+  Promise<PriceHistoryBatchResponse>
+>();
+expectTypeOf<
+  PriceHistoryBatchResponse["items"][string]
+>().toEqualTypeOf<PriceHistoryResponse>();
+expectTypeOf(client.history).not.toHaveProperty("batch");
+// @ts-expect-error A batch needs items.
+void rust.history.batch({});
 expectTypeOf<"INSUFFICIENT_DATA">().toMatchTypeOf<LiquidityBadge>();
 expectTypeOf(client.schema.snapshot()).toEqualTypeOf<
   Promise<SchemaSnapshotResponse>

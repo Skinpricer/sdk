@@ -80,3 +80,114 @@ export interface PriceHistoryByMarketResponse {
   /** Actual returned bucket width, which may differ from the requested interval. */
   effectiveInterval: "10m" | "1h" | "1d";
 }
+
+/** Currencies a history batch can be served in. */
+export type HistoryCurrency =
+  | "USD"
+  | "EUR"
+  | "GBP"
+  | "CHF"
+  | "RUB"
+  | "PLN"
+  | "BRL"
+  | "JPY"
+  | "NOK"
+  | "IDR"
+  | "MYR"
+  | "PHP"
+  | "SGD"
+  | "THB"
+  | "VND"
+  | "KRW"
+  | "TRY"
+  | "UAH"
+  | "MXN"
+  | "CAD"
+  | "AUD"
+  | "NZD"
+  | "CNY"
+  | "INR"
+  | "CLP"
+  | "PEN"
+  | "COP"
+  | "ZAR"
+  | "HKD"
+  | "TWD"
+  | "SAR"
+  | "AED"
+  | "SEK"
+  | "ARS"
+  | "ILS"
+  | "BYN"
+  | "KZT"
+  | "KWD"
+  | "QAR"
+  | "CRC"
+  | "UYU"
+  | "BGN"
+  | "HRK"
+  | "CZK"
+  | "DKK"
+  | "HUF"
+  | "RON";
+
+/** Economic basis of combined `SALE_HISTORY`. */
+export type SaleHistoryBasis = "cash_venue_windows_v1";
+
+export interface PriceHistoryBatchParams {
+  /**
+   * 1 to 100 items of the game, each an exact market hash name, a slug or a
+   * canonical item id. A repeated entry is read once.
+   */
+  items: string[];
+  /** Start of the range (Date or ISO string). */
+  from?: Date | string;
+  /** End of the range (Date or ISO string). */
+  to?: Date | string;
+  interval?: PriceHistoryInterval;
+  listingType?: HistoryListingTypeInput;
+  salesWindow?: SalesHistoryWindow;
+  /** `SALE_HISTORY` only. */
+  basis?: SaleHistoryBasis;
+  /** Serve prices in this currency instead of USD cents; see {@link HistoryFx}. */
+  currency?: HistoryCurrency;
+}
+
+/** An entry of a history batch that did not resolve to one item. */
+export interface PriceHistoryBatchError {
+  /** `ambiguous`: two items share the name or slug; use the canonical item id. */
+  error: "not_found" | "ambiguous";
+  /** The status a single history read of the entry returns. */
+  status: 404 | 409;
+  message: string;
+}
+
+/** The one rate every converted price in a response uses. */
+export interface HistoryFx {
+  base: "USD";
+  quote: HistoryCurrency;
+  /** Units of `quote` per 1 USD. */
+  rate: number;
+  source: string;
+  rateTime: IsoDateString | null;
+  /** Converted amounts are integers in this many decimal places of `quote`. */
+  minorUnitDigits: number;
+  rounding: "half_up";
+  fxBasis: "current";
+}
+
+/** `POST /v2/pricing/history/batch`. */
+export interface PriceHistoryBatchResponse {
+  listingType: HistoryListingType;
+  priceKind: HistoryPriceKind;
+  salesWindow?: SalesHistoryWindow | null;
+  effectiveInterval: "10m" | "1h" | "1d";
+  from: IsoDateString;
+  to: IsoDateString;
+  /** Each resolved entry, keyed exactly as sent. */
+  items: Record<string, PriceHistoryResponse>;
+  /** Each entry that did not resolve, keyed exactly as sent. */
+  errors: Record<string, PriceHistoryBatchError>;
+  /** Present only when `currency` is not USD. */
+  fx?: HistoryFx;
+}
