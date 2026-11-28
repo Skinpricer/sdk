@@ -64,7 +64,7 @@ does not change other clients or the default CS2 calls.
 | Resource    | Game-scoped methods for CS2 and Rust        |
 | ----------- | ------------------------------------------- |
 | `pricing`   | `get`, `listings`                           |
-| `history`   | `get`, `byMarket`                           |
+| `history`   | `get`, `byMarket`, `batch`                  |
 | `items`     | `search`, `searchEach`                      |
 | `nbbo`      | `get`, `depth`                              |
 | `liquidity` | `get`, `summary`, `batch`                   |
@@ -102,6 +102,27 @@ quantity. Arbitrage results can return `null` for `maxTradableQuantity` and
 Handle those values before calculations or display. `minNotionalCents` defaults
 to `1000`; positive values require verified capacity. Set it to `0` to also
 include indicative price pairs with unknown capacity.
+
+`history.batch` reads the aggregate history of up to 100 items in one request:
+
+```ts
+const batch = await cs2.history.batch({
+  items: ["AK-47 | Redline (Field-Tested)", "awp-asiimov-field-tested"],
+  from: "2026-10-29T00:00:00Z",
+  to: "2026-11-28T00:00:00Z",
+  interval: "DAY_1",
+});
+batch.items["awp-asiimov-field-tested"]?.history; // same body as history.get
+batch.errors; // entries that matched no item (404) or several (409)
+```
+
+Each entry is a market hash name, a slug or a canonical item id, and the response
+keys `items` and `errors` by the entry as sent. The batch shares the single read's
+10,000-point budget: items x buckets, counting both ends, and twice that for
+`SALE_HISTORY`. 100 items fit 30 days of `DAY_1` or 4 days of `HOUR_1`. A batch in
+10m buckets takes at most 25 items. The API rejects a larger batch with a 400
+error. Each distinct item costs 5 rate-limit units, as a single history read does.
+With `currency`, every item is converted at the one rate given in `fx`.
 
 History responses include `effectiveInterval`, the actual bucket width of the
 returned data: `10m`, `1h`, or `1d`. It can differ from the requested interval.

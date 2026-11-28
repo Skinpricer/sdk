@@ -85,6 +85,95 @@ describe.each(["cs2", "rust"] as const)("%s customer resources", (game) => {
   });
 });
 
+describe("history batch", () => {
+  it("posts the items and history options with the game", async () => {
+    const response = {
+      listingType: "SELL_OFFER",
+      priceKind: "ask_statistic",
+      salesWindow: null,
+      effectiveInterval: "1d",
+      from: "2026-10-29T00:00:00.000Z",
+      to: "2026-11-28T00:00:00.000Z",
+      items: {
+        "awp-asiimov-field-tested": {
+          canonicalItemId: "awp-asiimov-ft",
+          name: "AWP | Asiimov (Field-Tested)",
+          history: [],
+          listingType: "SELL_OFFER",
+          priceKind: "ask_statistic",
+          salesWindow: null,
+          effectiveInterval: "1d",
+        },
+      },
+      errors: {
+        "No Such Item": {
+          error: "not_found",
+          status: 404,
+          message: "Item not found",
+        },
+      },
+      fx: {
+        base: "USD",
+        quote: "EUR",
+        rate: 0.9127,
+        source: "frankfurter",
+        rateTime: "2026-11-27T15:18:43.322Z",
+        minorUnitDigits: 2,
+        rounding: "half_up",
+        fxBasis: "current",
+      },
+    };
+    const mock = createMockFetch({ json: response });
+    const client = new SkinpricerClient({
+      apiKey: "test-key",
+      fetch: mock.fetch,
+      retry: false,
+    });
+    const result = await client.forGame("cs2").history.batch({
+      items: ["awp-asiimov-field-tested", "No Such Item"],
+      from: new Date("2026-10-29T00:00:00Z"),
+      to: "2026-11-28T00:00:00Z",
+      interval: "DAY_1",
+      currency: "EUR",
+    });
+    expect(result).toEqual(response);
+    const call = mock.calls[0]!;
+    expect(call.method).toBe("POST");
+    expect(call.url).toBe(
+      "https://pricing.skinpricer.com/v2/pricing/history/batch?game=cs2",
+    );
+    expect(JSON.parse(call.body!)).toEqual({
+      items: ["awp-asiimov-field-tested", "No Such Item"],
+      from: "2026-10-29T00:00:00.000Z",
+      to: "2026-11-28T00:00:00Z",
+      interval: "DAY_1",
+      currency: "EUR",
+    });
+  });
+
+  it("sends the sales options", async () => {
+    const mock = createMockFetch({ json: {} });
+    const client = new SkinpricerClient({
+      apiKey: "test-key",
+      fetch: mock.fetch,
+      retry: false,
+    });
+    await client.forGame("rust").history.batch({
+      items: ["Tempered AK47"],
+      listingType: "SALE_HISTORY",
+      salesWindow: "7d",
+      basis: "cash_venue_windows_v1",
+    });
+    expect(mock.calls[0]!.url).toContain("game=rust");
+    expect(JSON.parse(mock.calls[0]!.body!)).toEqual({
+      items: ["Tempered AK47"],
+      listingType: "SALE_HISTORY",
+      salesWindow: "7d",
+      basis: "cash_venue_windows_v1",
+    });
+  });
+});
+
 describe("game scope", () => {
   it("exports the documented pricing resource classes", () => {
     expect(
@@ -133,6 +222,7 @@ describe("game scope", () => {
     expect(rust.items).not.toHaveProperty("all");
     expect(rust.liquidity).not.toHaveProperty("bulk");
     expect(rust.liquidity).not.toHaveProperty("manifest");
+    expect(client.history).not.toHaveProperty("batch");
   });
 
   it("rejects unsupported games before making a request", () => {
