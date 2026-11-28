@@ -1,5 +1,6 @@
 import type { RequestOptions } from "../http/http-client";
 import type {
+  GamePriceHistoryParams,
   PriceHistoryBatchParams,
   PriceHistoryBatchResponse,
   PriceHistoryByMarketResponse,
@@ -9,7 +10,7 @@ import type {
 import { encodePathSegment } from "../utils/url";
 import { BaseResource } from "./resource";
 
-function historyQuery(params: PriceHistoryParams) {
+function historyQuery(params: GamePriceHistoryParams) {
   return {
     from: params.from,
     to: params.to,
@@ -17,6 +18,8 @@ function historyQuery(params: PriceHistoryParams) {
     listingType: params.listingType,
     salesWindow: params.salesWindow,
     interval: params.interval,
+    basis: params.basis,
+    currency: params.currency,
   };
 }
 
@@ -41,7 +44,7 @@ export class HistoryResource extends BaseResource {
   /** `GET /v1/pricing/:marketHashName/history/markets` — per-market series. */
   byMarket(
     marketHashName: string,
-    params: PriceHistoryParams = {},
+    params: Omit<PriceHistoryParams, "basis"> = {},
     options?: RequestOptions,
   ): Promise<PriceHistoryByMarketResponse> {
     return this.call<PriceHistoryByMarketResponse>(
@@ -55,8 +58,24 @@ export class HistoryResource extends BaseResource {
   }
 }
 
-/** Game-scoped history, which adds the batch read. */
+/** Game-scoped history, which adds `currency` and the batch read. */
 export class GameHistoryResource extends HistoryResource {
+  override get(
+    marketHashName: string,
+    params: GamePriceHistoryParams = {},
+    options?: RequestOptions,
+  ): Promise<PriceHistoryResponse> {
+    return super.get(marketHashName, params, options);
+  }
+
+  override byMarket(
+    marketHashName: string,
+    params: Omit<GamePriceHistoryParams, "basis"> = {},
+    options?: RequestOptions,
+  ): Promise<PriceHistoryByMarketResponse> {
+    return super.byMarket(marketHashName, params, options);
+  }
+
   /**
    * `POST /v2/pricing/history/batch` — the aggregate series of {@link get} for
    * up to 100 items. Entries that do not resolve are listed in `errors` and

@@ -32,6 +32,14 @@ export interface PriceHistoryParams {
   listingType?: HistoryListingTypeInput;
   salesWindow?: SalesHistoryWindow;
   interval?: PriceHistoryInterval;
+  /** `SALE_HISTORY` only. Not accepted by `byMarket`. */
+  basis?: SaleHistoryBasis;
+}
+
+/** History options of a game-scoped client, which can also convert prices. */
+export interface GamePriceHistoryParams extends PriceHistoryParams {
+  /** Serve prices in this currency instead of USD cents; see {@link HistoryFx}. */
+  currency?: HistoryCurrency;
 }
 
 export interface PriceHistoryPoint {
@@ -58,6 +66,43 @@ export interface PriceHistoryResponse {
   salesWindow: SalesHistoryWindow | null;
   /** Actual returned bucket width, which may differ from the requested interval. */
   effectiveInterval: "10m" | "1h" | "1d";
+  /** Combined `SALE_HISTORY` only. */
+  basis?: SaleHistoryBasis;
+  /**
+   * Combined `SALE_HISTORY` only: an equally weighted index of venues, so
+   * `medianPrice` is the median of venue medians, not of individual sales.
+   */
+  statistic?: "venue_price_index";
+  /**
+   * Combined `SALE_HISTORY` only: `volume` sums each venue's latest trailing
+   * window, so adding it across buckets counts sales more than once.
+   */
+  volumeBasis?: "trailing_window_count";
+  /** Combined `SALE_HISTORY` only. Steam sales are never part of `history`. */
+  steamWallet?: SteamWalletHistory;
+  /** Present only when stored history known to be wrong was left out. */
+  corrections?: HistoryCorrection[];
+  /** Present only when `currency` is not USD. */
+  fx?: HistoryFx;
+}
+
+/**
+ * A range of one market's stored history left out because it is known to be
+ * wrong. The market contributes nothing to a point whose bucket overlaps it.
+ */
+export interface HistoryCorrection {
+  market: string;
+  /** Inclusive. */
+  from: IsoDateString;
+  /** Exclusive. */
+  to: IsoDateString;
+  reason: string;
+}
+
+/** Steam Community Market sales in gross wallet value, never converted to cash. */
+export interface SteamWalletHistory {
+  basis: "steam_wallet_gross";
+  history: PriceHistoryPoint[];
 }
 
 export interface MarketSeries {
@@ -79,9 +124,13 @@ export interface PriceHistoryByMarketResponse {
   salesWindow: SalesHistoryWindow | null;
   /** Actual returned bucket width, which may differ from the requested interval. */
   effectiveInterval: "10m" | "1h" | "1d";
+  /** Present only when stored history known to be wrong was left out. */
+  corrections?: HistoryCorrection[];
+  /** Present only when `currency` is not USD. */
+  fx?: HistoryFx;
 }
 
-/** Currencies a history batch can be served in. */
+/** Currencies game-scoped history can be served in. */
 export type HistoryCurrency =
   | "USD"
   | "EUR"
