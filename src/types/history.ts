@@ -54,6 +54,27 @@ export interface PriceHistoryPoint {
   bestBidCents: Cents | null;
   bestAskCents: Cents | null;
   spreadBps: number | null;
+  /** Seller-net cash bid after the venue commission. Null for combined `SALE_HISTORY`. */
+  netBestBidCents?: Cents | null;
+  /** Spread between `bestAskCents` and `netBestBidCents`. Null for combined `SALE_HISTORY`. */
+  netSpreadBps?: number | null;
+  /** Combined `SALE_HISTORY` only: the venues contributing to this point. */
+  contributingMarkets?: string[];
+  /** Combined `SALE_HISTORY` only: each contributing venue's latest snapshot in the bucket. */
+  observations?: SaleHistoryObservation[];
+  /**
+   * Per-market `SELL_OFFER` only: `minPrice` in the venue's own currency and
+   * minor units, before conversion and fees.
+   */
+  originalPriceCents?: number | null;
+  /** ISO currency of `originalPriceCents`; null exactly when it is null. */
+  originalCurrency?: string | null;
+}
+
+/** When one venue's trailing sales window was fetched. */
+export interface SaleHistoryObservation {
+  market: string;
+  observedAt: IsoDateString;
 }
 
 /** `GET /v1/pricing/:marketHashName/history` (camelCase). */
@@ -62,7 +83,7 @@ export interface PriceHistoryResponse {
   name: string;
   history: PriceHistoryPoint[];
   listingType: HistoryListingType;
-  priceKind?: HistoryPriceKind;
+  priceKind: HistoryPriceKind;
   salesWindow: SalesHistoryWindow | null;
   /** Actual returned bucket width, which may differ from the requested interval. */
   effectiveInterval: "10m" | "1h" | "1d";
@@ -107,6 +128,11 @@ export interface SteamWalletHistory {
 
 export interface MarketSeries {
   market: string;
+  /**
+   * `native`: the market quotes USD. `historical`: each value was converted to
+   * USD at the rate when it was observed, so the series also moves with FX.
+   */
+  fxBasis: "historical" | "native";
   history: PriceHistoryPoint[];
   /** `SELL_OFFER` series only. */
   sellBasis?: SellBasis;
@@ -120,7 +146,7 @@ export interface PriceHistoryByMarketResponse {
   name: string;
   series: MarketSeries[];
   listingType: HistoryListingType;
-  priceKind?: HistoryPriceKind;
+  priceKind: HistoryPriceKind;
   salesWindow: SalesHistoryWindow | null;
   /** Actual returned bucket width, which may differ from the requested interval. */
   effectiveInterval: "10m" | "1h" | "1d";

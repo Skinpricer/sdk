@@ -3,6 +3,10 @@ import {
   SkinpricerClient,
   type HistoryCorrection,
   type HistoryFx,
+  type MarketSeries,
+  type PriceHistoryByMarketResponse,
+  type PriceHistoryPoint,
+  type SaleHistoryObservation,
   type PriceHistoryBatchResponse,
   type PriceHistoryResponse,
   type LiquidityBadge,
@@ -57,6 +61,21 @@ expectTypeOf<
 >().toEqualTypeOf<HistoryCorrection>();
 expectTypeOf<PriceHistoryResponse["fx"]>().toEqualTypeOf<
   HistoryFx | undefined
+>();
+expectTypeOf<PriceHistoryResponse["priceKind"]>().toEqualTypeOf<
+  "ask_statistic" | "bid_statistic" | "sale_statistic"
+>();
+expectTypeOf<PriceHistoryByMarketResponse["priceKind"]>().toEqualTypeOf<
+  PriceHistoryResponse["priceKind"]
+>();
+expectTypeOf<MarketSeries["fxBasis"]>().toEqualTypeOf<
+  "historical" | "native"
+>();
+expectTypeOf<PriceHistoryPoint["observations"]>().toEqualTypeOf<
+  SaleHistoryObservation[] | undefined
+>();
+expectTypeOf<PriceHistoryPoint["originalCurrency"]>().toEqualTypeOf<
+  string | null | undefined
 >();
 void rust.history.get("Tempered AK47", { currency: "EUR" });
 // @ts-expect-error The v1 history routes do not convert currencies.
