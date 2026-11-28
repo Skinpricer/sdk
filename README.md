@@ -119,7 +119,8 @@ batch.errors; // entries that matched no item (404) or several (409)
 Each entry is a market hash name, a slug or a canonical item id, and the response
 keys `items` and `errors` by the entry as sent. The batch shares the single read's
 10,000-point budget: items x buckets, counting both ends, and twice that for
-`SALE_HISTORY`. 100 items fit 30 days of `DAY_1` or 4 days of `HOUR_1`. A batch in
+`SALE_HISTORY`. 100 items fit 30 days of `DAY_1`, or 4 days of `HOUR_1` for asks or
+bids. A batch in
 10m buckets takes at most 25 items. The API rejects a larger batch with a 400
 error. Each distinct item costs 5 rate-limit units, as a single history read does.
 With `currency`, every item is converted at the one rate given in `fx`.
